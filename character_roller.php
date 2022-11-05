@@ -27,7 +27,7 @@
       </ul>
     </header>
     <main>
-      <label>This button proves my site is working and actually does something <button><a href="character_roller.php">Click it!</a></button></label>
+      
       
     </main>
     <footer>
