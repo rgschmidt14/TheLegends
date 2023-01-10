@@ -1,18 +1,40 @@
+html {
+    background-image: url("/Site-Stuff/Assets/Images/AI-Art/DALL·E 2022-10-03 13.38.52 - Looking into.png");
+
+}
 body {
+    background-color: rgba(255, 255, 255, 0.5);
     margin: auto;
+    min-height: 100vh;
+    padding-top: 5px;
 }
 #site-wide-nav-header ul {
-    padding: 0;
+    background-image: url("/Site-Stuff/Assets/Images/AI-Art/IMG_20220909_012056.png");
+    /*background-position: 0 0px;*/
+    background-size: 100%;
+    padding: 75px 0 5px 0;
     display: flex;
     justify-content: center;
+    width: 90%;
+    margin: 0 auto;
 }
 #site-wide-nav-header ul a {
     text-decoration: none;
     margin: 0 1vw;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 5%;
+    padding: 1px;
 }
 #site-wide-nav-header ul a li {
     list-style: none;
 }
-#site-wide-nav-header img {
+/* #site-wide-nav-header img {
     height: 100px;
+} */
+footer#main-footer {
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    bottom: 0; /* fix this */
+    left: 40%; /* https://www.freecodecamp.org/news/how-to-keep-your-footer-where-it-belongs-59c6aa05c59c/ */
 }
