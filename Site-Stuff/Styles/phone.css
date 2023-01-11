@@ -1,6 +1,16 @@
+:root {
+    --MAGIC_NUMBER: 364;
+    --MAGIC_NUMBER_PIXELS: var(--MAGIC_NUMBER)px;
+    --VIEWPORT_MODIFIER_WIDTH: calc(100vw + 364px);
+}
+
+
+
+
+
 html {
     background-image: url("/Site-Stuff/Assets/Images/AI-Art/DALL·E 2022-10-03 13.38.52 - Looking into.png");
-
+    
 }
 body {
     background-color: rgba(255, 255, 255, 0.5);
@@ -10,13 +20,19 @@ body {
 }
 #site-wide-nav-header ul {
     background-image: url("/Site-Stuff/Assets/Images/AI-Art/IMG_20220909_012056.png");
+    animation: scrollRight 15s linear infinite;
     /*background-position: 0 0px;*/
-    background-size: 100%;
+    background-size: var(--VIEWPORT_MODIFIER_WIDTH);
     padding: 75px 0 5px 0;
     display: flex;
     justify-content: center;
     width: 90%;
     margin: 0 auto;
+}
+/* Scrolling Header */
+@keyframes scrollRight {
+    from {background-position: left;} 
+    to {background-position: calc(-1 * var(--VIEWPORT_MODIFIER_WIDTH));}
 }
 #site-wide-nav-header ul a {
     text-decoration: none;

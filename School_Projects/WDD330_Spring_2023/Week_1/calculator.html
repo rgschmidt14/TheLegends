@@ -1,0 +1,39 @@
+
+<h1>Javascript "this" Calculator</h1>
+<p>Input two numbers and four will be returned. Refresh to try again.</p>
+<p><span id="a"></span> and <span id="b"></span></p>
+<ul>
+    <li>Added: <span id="sum"></span></li>
+    <li>Multiplied: <span id="mul"></span></li>
+    <li>Subtracted: <span id="sub"></span></li>
+    <li>Divided: <span id="div"></span></li>
+</ul>
+<script>
+    let calculator = {
+        sum(){
+            return (this.a + this.b);
+        },
+        mul(){
+            return (this.a * this.b);
+        },
+        sub(){
+            return (this.a - this.b);
+        },
+        div(){
+            return (this.a / this.b);
+        },
+        read(){
+            this.a = Number(prompt("First number?", 0));
+            this.b = Number(prompt("Second number?", 0));
+        }
+    };
+
+    calculator.read();
+    document.getElementById("sum").innerHTML = calculator.sum() ;
+    document.getElementById("mul").innerHTML = calculator.mul() ;
+    document.getElementById("sub").innerHTML = calculator.sub() ;
+    document.getElementById("div").innerHTML = calculator.div() ;
+    document.getElementById("a").innerHTML = calculator.a ;
+    document.getElementById("b").innerHTML = calculator.b ;
+
+</script>
