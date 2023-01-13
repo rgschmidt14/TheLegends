@@ -1,0 +1,49 @@
+<template>
+    <div id="card">
+        <h2>Full name</h2>
+        <p>Birth date</p>
+        <p>Birth place</p>
+        <img class="profile" src="#">
+    </div>
+</template>
+<script>
+    // note this builds a single card
+    console.log(1);
+    function buildProphetCard(prophetsData){
+        console.log(3)
+        for (i = 0; i < prophetsData["prophets"].length; i++) {
+            console.log(i);
+            console.log(prophetsData["prophets"][i]);
+            var temp, name, bDate, bPlace, profileImage;
+            temp = document.getElementsByTagName("template")[0];
+            cardCopy = temp.content.cloneNode(true);
+
+            // Selecting the tags to later insert html into
+            name = cardCopy.querySelector("h2");
+            bDate = cardCopy.querySelectorAll("p")[0];
+            bPlace = cardCopy.querySelectorAll("p")[1];
+            profileImage = cardCopy.querySelector("img");
+
+            // Now inserting the html
+            
+
+            // Appending the new node (card)
+            a = document.importNode(cardCopy, true);
+            document.body.appendChild(a);
+            // b = document.importNode(bDate, true);
+            // document.body.appendChild(b);
+            // c = document.importNode(bPlace, true);
+            // document.body.appendChild(c);
+            // d = document.importNode(profileImage, true);
+            // document.body.appendChild(d);
+        }
+    }
+    fetch("latter-day-prophets.json")
+        .then(response => {
+            return response.json();
+        })
+        .then(prophetsData => buildProphetCard(prophetsData))
+    console.log(2);
+    
+
+</script>
