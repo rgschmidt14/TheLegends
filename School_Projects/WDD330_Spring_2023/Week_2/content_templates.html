@@ -1,5 +1,27 @@
+<style>
+    div.card {
+        background-color: teal;
+        margin: 1vw;
+        max-height: min-content;
+        padding: 1vh;
+        max-width: 300px;
+
+    }
+    div.card img {
+        max-height: 75vh;
+        max-width: 300px;
+
+    }
+    body {
+        display: flex;
+        flex-wrap: wrap;
+        min-width: 350px;
+        
+        
+    }
+</style>
 <template>
-    <div id="card">
+    <div class="card">
         <h2>Full name</h2>
         <p>Birth date</p>
         <p>Birth place</p>
@@ -11,25 +33,23 @@
     console.log(1);
     function buildProphetCard(prophetsData){
         console.log(3)
-        for (i = 0; i < prophetsData["prophets"].length; i++) {
-            console.log(i);
-            console.log(prophetsData["prophets"][i]);
+        pad = prophetsData["prophets"] // for prophets array data
+        for (i = 0; i < pad.length; i++) {
             var temp, name, bDate, bPlace, profileImage;
             temp = document.getElementsByTagName("template")[0];
             cardCopy = temp.content.cloneNode(true);
 
-            // Selecting the tags to later insert html into
-            name = cardCopy.querySelector("h2");
-            bDate = cardCopy.querySelectorAll("p")[0];
-            bPlace = cardCopy.querySelectorAll("p")[1];
-            profileImage = cardCopy.querySelector("img");
 
-            // Now inserting the html
-            
+            // Selecting the tags and inserting the html into them
+            cardCopy.querySelector("h2").innerHTML = pad[i].name + " " + pad[i].lastname;
+            cardCopy.querySelectorAll("p")[0].innerHTML = pad[i].birthdate;
+            cardCopy.querySelectorAll("p")[1].innerHTML = pad[i].birthplace;
+            cardCopy.querySelector("img").src = pad[i].imageurl;
 
             // Appending the new node (card)
-            a = document.importNode(cardCopy, true);
-            document.body.appendChild(a);
+            // a = document.importNode(cardCopy, true);
+            document.body.appendChild(cardCopy);
+ 
             // b = document.importNode(bDate, true);
             // document.body.appendChild(b);
             // c = document.importNode(bPlace, true);
