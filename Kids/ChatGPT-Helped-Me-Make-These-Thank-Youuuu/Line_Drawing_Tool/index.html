@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head id="head">
+  <!--Page Data-->
+  <title>Schmidts.Page</title>
+  <meta name="description" content="Schmidts.Page is an Alpha rendition of what will be later released as a set of tools for RPGs on the fly.">
+  <link rel="shortcut icon" href="/Site-Stuff/Assets/Images/golden_bed.ico">
+  <style>
+    canvas {
+        border: 1px solid #000;
+        background-color: #fff;
+    }
+
+    button {
+        background-color: #5B9BD5;
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #3f7eab;
+    }
+
+</style>
+</head>
+<body>
+    <header id="site-wide-nav-header">
+
+    </header>
+    <main>
+        <label>Template Link Label <button><a href="#">Click it!</a></button></label>
+        <canvas id="canvas"></canvas>
+        <button id="confirm-button">Confirm</button>
+        <button id="restart-button">Restart</button>
+        <p id="output"></p>
+        <button id="apply-scale-button">Apply Scale</button>
+
+    </main>
+    <footer id="main-footer">
+
+    </footer>
+</body>
+<script src="/Site-Stuff/Scripting/Snippets/template_level_snippets.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/p5"></script>
+<script>
+    // Part 1: Setting up the canvas and drawing functionality
+    var canvas;
+    var startX, startY, endX, endY;
+    var xMin = 0, xMax = 100, yMin = 0, yMax = 100;
+
+    function setup() {
+        // Get the canvas element from the HTML with id "canvas"
+        canvas = document.getElementById("canvas");
+        canvas.width = 500;
+        canvas.height = 500;
+        var ctx = canvas.getContext("2d");
+        // Attach the necessary functions for drawing (mousePressed, mouseReleased, etc.)
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mouseup', endDrawing);
+        drawGrid();
+    }
+
+    function startDrawing(event) {
+        startX = event.offsetX;
+        startY = event.offsetY;
+    }
+
+    function endDrawing(event) {
+        endX = event.offsetX;
+        endY = event.offsetY;
+        drawLine(startX, startY, endX, endY);
+    }
+
+    function drawLine(x1, y1, x2, y2) {
+        var ctx = canvas.getContext("2d");
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+    }
+
+    // Part 2: Handling user input
+    var confirmButton = document.getElementById("confirm-button");
+    confirmButton.addEventListener("click", confirmDrawing);
+
+    var restartButton = document.getElementById("restart-button");
+    restartButton.addEventListener("click", startOver);
+
+    function confirmDrawing() {
+        // Calculate the line function and display it on the page
+        var slope = (mapY(endY) - mapY(startY)) / (mapX(endX) - mapX(startX));
+        var yIntercept = mapY(startY) - (slope * mapX(startX));
+        var equation = "y = " + slope + "x + " + yIntercept;
+        document.getElementById("output").innerHTML = equation;
+    }
+
+    function startOver() {
+        var ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Part 3: Generating the line function
+    function confirmDrawing() {
+        var slope = (mapY(endY) - mapY(startY)) / (mapX(endX) - mapX(startX));
+        var yIntercept = mapY(startY) - (slope * mapX(startX));
+        var equation = "y = " + slope + "x + " + yIntercept;
+        document.getElementById("output").innerHTML = equation;
+    }
+
+    // Part 5: Scaling the graph
+    var xMinInput, xMaxInput, yMinInput, yMaxInput;
+    var xMin, xMax, yMin, yMax;
+
+    // Part 5.1: Create input elements for setting the scale of the graph
+    xMinInput = document.createElement("input");
+    xMinInput.type = "number";
+    xMinInput.placeholder = "x min";
+    xMinInput.id = "x-min";
+    xMinInput.value = 0;
+    document.body.appendChild(xMinInput);
+
+    xMaxInput = document.createElement("input");
+    xMaxInput.type = "number";
+    xMaxInput.placeholder = "x max";
+    xMaxInput.id = "x-max";
+    xMaxInput.value = 100;
+    document.body.appendChild(xMaxInput);
+
+    yMinInput = document.createElement("input");
+    yMinInput.type = "number";
+    yMinInput.placeholder = "y min";
+    yMinInput.id = "y-min";
+    yMinInput.value = 0;
+    document.body.appendChild(yMinInput);
+
+    yMaxInput = document.createElement("input");
+    yMaxInput.type = "number";
+    yMaxInput.placeholder = "y max";
+    yMaxInput.id = "y-max";
+    yMaxInput.value = 100;
+    document.body.appendChild(yMaxInput);
+
+    // Part 5.2: Create a button to apply the scale to the graph
+    // Part 5.3: Apply the scale of the graph when the apply scale button is clicked
+    var applyScaleButton = document.getElementById("apply-scale-button");
+    applyScaleButton.addEventListener("click", applyScale);
+
+    // Part 5.5: Draw the numbers on the grid
+    function drawNumbers() {
+        var ctx = canvas.getContext("2d");
+        ctx.font = "10px Arial";
+        ctx.fillStyle = "black";
+        var xMin = parseFloat(document.getElementById("x-min").value);
+        var xMax = parseFloat(document.getElementById("x-max").value);
+        var yMin = parseFloat(document.getElementById("y-min").value);
+        var yMax = parseFloat(document.getElementById("y-max").value);
+        var xStep = (xMax - xMin) / 10;
+        var yStep = (yMax - yMin) / 10;
+        for (var x = xMin; x <= xMax; x += xStep) {
+            ctx.fillText(x.toFixed(1), mapX(x) - 5, mapY(yMin) + 20);
+        }
+        for (var y = yMin; y <= yMax; y += yStep) {
+            ctx.fillText(y.toFixed(1), mapX(xMin) - 25, mapY(y) + 5);
+        }
+    }
+
+    function applyScale() {
+        xMin = xMinInput.value;
+        xMax = xMaxInput.value;
+        yMin = yMinInput.value;
+        yMax = yMaxInput.value;
+        drawGrid(xMin, xMax, yMin, yMax);
+        drawNumbers()
+        var slope = (mapY(endY) - mapY(startY)) / (mapX(endX) - mapX(startX));
+        var yIntercept = mapY(startY) - (slope * mapX(startX));
+        console.log(startY, mapY(startY), yIntercept, mapX(startX), startX);
+        var equation = "y = " + slope + "x + " + yIntercept;
+        document.getElementById("output").innerHTML = equation;
+    }
+
+    // Part 5.6: Draw the grid
+    function drawGrid(xMin, xMax, yMin, yMax) {
+        var ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw vertical grid lines
+        var xSpacing = canvas.width / (xMax - xMin);
+        for (var x = xMin + 1; x < xMax; x++) {
+            var xCoord = mapX(x);
+            ctx.beginPath();
+            ctx.moveTo(xCoord, 0);
+            ctx.lineTo(xCoord, canvas.height);
+            ctx.stroke();
+        }
+
+        // Draw horizontal grid lines
+        var ySpacing = canvas.height / (yMax - yMin);
+        for (var y = yMin + 1; y < yMax; y++) {
+            var yCoord = mapY(y);
+            ctx.beginPath();
+            ctx.moveTo(0, yCoord);
+            ctx.lineTo(canvas.width, yCoord);
+            ctx.stroke();
+        }
+    }
+
+    // Part 5.7: Map x and y coordinates to canvas coordinates
+    function mapX(x) {
+        return (x - xMin) * (canvas.width / (xMax - xMin));
+    }
+
+    function mapY(y) {
+        return canvas.height - (y - yMin) * (canvas.height / (yMax - yMin));
+    }
+
+    setup();
+</script>
+
+<!--<script>
+    // Part 1: Setting up the canvas and drawing functionality
+    var canvas;
+    var startX, startY, endX, endY;
+
+    function setup() {
+        // Get the canvas element from the HTML with id "canvas"
+        canvas = document.getElementById("canvas");
+        canvas.width = 500;
+        canvas.height = 500;
+        var ctx = canvas.getContext("2d");
+        // Attach the necessary functions for drawing (mousePressed, mouseReleased, etc.)
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mouseup', endDrawing);
+    }
+
+    function startDrawing(event) {
+        startX = event.offsetX;
+        startY = event.offsetY;
+    }
+
+    function endDrawing(event) {
+        endX = event.offsetX;
+        endY = event.offsetY;
+        drawLine(startX, startY, endX, endY);
+    }
+
+    function drawLine(x1, y1, x2, y2) {
+        var ctx = canvas.getContext("2d");
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+    }
+
+    // Part 2: Handling user input
+    var confirmButton = document.getElementById("confirm-button");
+    confirmButton.addEventListener("click", confirmDrawing);
+
+    var restartButton = document.getElementById("restart-button");
+    restartButton.addEventListener("click", startOver);
+
+    function confirmDrawing() {
+        // Calculate the line function and display it on the page
+        var slope = (endY - startY) / (endX - startX);
+        var yIntercept = startY - (slope * startX);
+        var equation = "y = " + slope + "x + " + yIntercept;
+        document.getElementById("output").innerHTML = equation;
+    }
+
+    function startOver() {
+        var ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+
+    // Part 3: Generating the line function
+    function confirmDrawing() {
+        var slope = (mapY(endY) - mapY(startY)) / (mapX(endX) - mapX(startX));
+        var yIntercept = mapY(startY) - (slope * mapX(startX));
+        var equation = "y = " + slope + "x + " + yIntercept;
+        document.getElementById("output").innerHTML = equation;
+    }
+
+
+    // Part 5.1: Create input elements for setting the scale of the graph
+    var xMinInput = document.createElement("input");
+    xMinInput.setAttribute("type", "number");
+    xMinInput.setAttribute("placeholder", "Enter x-min value");
+    document.body.appendChild(xMinInput);
+
+    var xMaxInput = document.createElement("input");
+    xMaxInput.setAttribute("type", "number");
+    xMaxInput.setAttribute("placeholder", "Enter x-max value");
+    document.body.appendChild(xMaxInput);
+
+    var yMinInput = document.createElement("input");
+    yMinInput.setAttribute("type", "number");
+    yMinInput.setAttribute("placeholder", "Enter y-min value");
+    document.body.appendChild(yMinInput);
+
+    var yMaxInput = document.createElement("input");
+    yMaxInput.setAttribute("type", "number");
+    yMaxInput.setAttribute("placeholder", "Enter y-max value");
+    document.body.appendChild(yMaxInput);
+
+    // Part 5.2: Create button to apply the scale setting
+    var applyScaleButton = document.createElement("button");
+    applyScaleButton.innerHTML = "Apply Scale";
+    applyScaleButton.addEventListener("click", applyScale);
+    document.body.appendChild(applyScaleButton);
+
+    // Part 5.3: Create variables to store the user's scale settings
+    var xMin, xMax, yMin, yMax;
+
+    // Part 5.4: Function to apply the user's scale settings
+    function applyScale() {
+        xMin = xMinInput.value;
+        xMax = xMaxInput.value;
+        yMin = yMinInput.value;
+        yMax = yMaxInput.value;
+
+        // Redraw the line with the new scale
+        drawLine(mapX(startX), mapY(startY), mapX(endX), mapY(endY));
+    }
+
+    // Part 5.5: Function to map x-coordinates to the user's scale
+    function mapX(x) {
+        return ((x - xMin) / (xMax - xMin)) * canvas.width;
+    }
+
+    // Part 5.6: Function to map y-coordinates to the user's scale
+    function mapY(y) {
+        return ((y - yMin) / (yMax - yMin)) * canvas.height;
+    }
+
+    // Part 6: Drawing the grid and labels
+    function drawGrid() {
+        var ctx = canvas.getContext("2d");
+        ctx.strokeStyle = "#ccc";
+        ctx.lineWidth = 1;
+
+        // Draw horizontal grid lines
+        for (var i = 0; i <= canvas.height; i += 50) {
+            ctx.beginPath();
+            ctx.moveTo(0, i);
+            ctx.lineTo(canvas.width, i);
+            ctx.stroke();
+
+            ctx.fillText(unmapY(i), 0, i);
+        }
+
+        // Draw vertical grid lines
+        for (var i = 0; i <= canvas.width; i += 50) {
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i, canvas.height);
+            ctx.stroke();
+
+            ctx.fillText(unmapX(i), i, 10);
+        }
+    }
+    setup();
+
+</script>-->
+</html>
