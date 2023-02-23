@@ -1,24 +1,46 @@
+/***********************Root & Variables******************************/
 :root {
-    --MAGIC_NUMBER: 364;
-    --MAGIC_NUMBER_PIXELS: var(--MAGIC_NUMBER)px;
-    --VIEWPORT_MODIFIER_WIDTH: calc(100vw + 364px);
+    /*For the Moving Image*/
+    --MAGIC_NUMBER_1: 364; /*Based on the width of the ... image size? Or was it the size of the small window?*/
+    --MAGIC_NUMBER_PIXELS_1: var(--MAGIC_NUMBER_1) * 1px; /*to add units I had to times it by one of that unit! Concatenating did not work the ways I tried it.*/
+    --VIEWPORT_MODIFIER_WIDTH: calc(100vw + var(--MAGIC_NUMBER_PIXELS_1));
+    /*For the Variable Layout and Text Size*/
+    --BASE_SCREEN_WIDTH: 364; /*in pixel*/
+    --BASE_SCREEN_HEIGHT: 728; /*in pixel*/
+    --ADJUSTED_SCREEN_WIDTH_RATIO: calc(100vw / var(--BASE_SCREEN_WIDTH));
+    --ADJUSTED_SCREEN_HEIGHT_RATIO: calc(100vh / var(--BASE_SCREEN_HEIGHT));
+    --COMBINED_CHANGE_RATIO: calc((var(--ADJUSTED_SCREEN_HEIGHT_RATIO) + var(--ADJUSTED_SCREEN_WIDTH_RATIO)) / 2);
+    --VARIABLE_TEXT_SIZE_ORIGINAL: 16 * var(--COMBINED_CHANGE_RATIO);
+    --SMALL_TEXT: calc((var(--VARIABLE_TEXT_SIZE_ORIGINAL)) / 8 * 7);
+    --MEDIUM_TEXT: calc((var(--VARIABLE_TEXT_SIZE_ORIGINAL)) / 7 * 8);
+    --LARGE_TEXT: calc((var(--VARIABLE_TEXT_SIZE_ORIGINAL)) * 2);
+    --VERTICAL_MARGIN: calc(var(--COMBINED_CHANGE_RATIO) * 11 );
 }
 
 
 
-
-
+/**********************************HTML********************************/
 html {
     background-image: url("/Site-Stuff/Assets/Images/AI-Art/DALL·E 2022-10-03 13.38.52 - Looking into.png");
-    
 }
+
+
+
+/*******************************Body************************************/
 body {
     background-color: rgba(255, 255, 255, 0.5);
     margin: auto;
     min-height: 100vh;
     padding-top: 5px;
 }
+
+
+
+
+/****************************Scrolling Header*********************************/
 #site-wide-nav-header ul {
+    display: flex;
+    flex-wrap: wrap;
     background-image: url("/Site-Stuff/Assets/Images/AI-Art/IMG_20220909_012056.png");
     animation: scrollRight 30s linear infinite;
     background-position: 500px;
@@ -29,7 +51,6 @@ body {
     width: 90%;
     margin: 0 auto;
 }
-/* Scrolling Header */
 @keyframes scrollRight {
     from {background-position: left top;} 
     to {background-position: calc(-1 * var(--VIEWPORT_MODIFIER_WIDTH)) top;}
@@ -47,10 +68,36 @@ body {
 /* #site-wide-nav-header img {
     height: 100px;
 } */
-footer#main-footer {
+header h1 {
+    text-align: center;
+    font-size: var(--LARGE_TEXT);
+}
+
+
+
+/*******************************Main************************************/
+main {
+    margin: auto;
+
+}
+main a {
+    text-decoration: none;
+}
+main button {
     display: flex;
     justify-content: center;
-    position: absolute;
-    bottom: 0; /* fix this */
-    left: 40%; /* https://www.freecodecamp.org/news/how-to-keep-your-footer-where-it-belongs-59c6aa05c59c/ */
+    align-items: center;
+    margin: var(--VERTICAL_MARGIN) auto var(--VERTICAL_MARGIN) auto;
+    font-size: var(--MEDIUM_TEXT);
+    height: calc(var(--LARGE_TEXT) * 2);
+    
+}
+
+/******************************Footer**************************************/
+footer#main-footer {
+    font-size: var(--SMALL_TEXT);
+    display: flex;
+    justify-content: center;
+    margin: var(--VERTICAL_MARGIN) auto 0 auto; /* fix this */
+     /* https://www.freecodecamp.org/news/how-to-keep-your-footer-where-it-belongs-59c6aa05c59c/ */
 }
