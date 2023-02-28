@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head id="head">
+  <!--Page Data-->
+  <title>Schmidts.Page</title>
+  <meta name="description" content="Schmidts.Page is an Alpha rendition of what will be later released as a set of tools for RPGs on the fly.">
+  <link rel="shortcut icon" href="/Site-Stuff/Assets/Images/golden_bed.ico">
+  <style>
+    label:not([hidden]){
+      display: block;
+    }
+  </style>
+</head>
+<body>
+    <header id="site-wide-nav-header">
+      
+    </header>
+    <main>
+      <form>
+        <fieldset>
+          <legend>New Task</legend>
+          <input name="taskName" type="text" maxlength="50" placeholder="Task Name Here">
+        </fieldset>
+        <fieldset id="lvlOfImportance">
+          <label for="eminanceOfFailure">Eminance of Failure when missed</label>
+          <select name="eminanceOfFailure" id="eminanceOfFailure" placeholder="Please Choose..." onchange="showTheThing('eminanceOfFailure', 'Cumulative', 'cumulaNum')" required>
+            <option>Immediate</option>
+            <option>Cumulative</option>
+            <option>Nugatory</option>
+          </select>
+          <label for="cumulaNum" id="cumulaNumLabel" hidden>Cumulative Limit Before Failure</label>
+          <input name="cumulaNum" id="cumulaNum" type="number" step="10" hidden>
+        </fieldset>
+        <fieldset>
+          <label>Units of Measurement</label>
+          <select name="taskUnits" id="taskUnits" placeholder="Please Choose..." onchange="showTheThing('taskUnits', 'Custom Units', 'customUnits')">
+            <option>Number (No Units)</option>
+            <option>Custom Units</option>
+            <option>Time</option>
+          </select>
+          <label for="customUnits" id="customUnitsLabel" hidden>Custom Units</label>
+          <input name="customUnits" id="customUnits" type="text" hidden>
+          <label for="taskQuantity">Quantity Needed</label>
+          <input name="taskQuantity" type="number">
+        </fieldset>
+        <label>Reset at this time of day<input name="taskHourReset" type="time"></label>
+        <label>Reset after this many days<input name="taskDayReset" type="number" value="1"></label>
+        <label>Time allowed for completion (beyond hour specified above)<input name="taskTimeAllowed" type="number"></label>
+        <label><input name="" type=""></label>
+        <label><input name="" type=""></label>
+        <label><textarea name="desc" id="desc" maxlength="555" placeholder="Write Description here"></textarea></label>
+
+        <input type="submit" value="Submit">
+
+      </form>
+      
+    </main>
+    <footer id="main-footer">
+
+    </footer>
+</body>
+<script src="/Site-Stuff/Scripting/Snippets/template_level_snippets.js"></script>
+<script>
+  function showTheThing(theId, verifyText, theThingsId){
+    let theThingOption = document.getElementById(`${theId}`).value;
+    let theThing = document.getElementById(`${theThingsId}`);
+    let theThingsLabel = document.getElementById(`${theThingsId}Label`)
+
+    if(theThingOption === verifyText){
+      theThing.removeAttribute("hidden");
+      theThingsLabel.removeAttribute("hidden");
+      console.log("Ohhh")
+    } else {
+      theThing.hidden = true;
+      theThingsLabel.hidden = true;
+      console.log("snap")
+    }
+  }
+  function setUnitOfMeasurement(){
+    let unitOption = document.getElementById("taskUnits")
+  }
+</script>
+</html>

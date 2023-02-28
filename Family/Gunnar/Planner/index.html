@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head id="head">
+  <!--Page Data-->
+  <title>Schmidts.Page</title>
+  <meta name="description" content="Schmidts.Page is an Alpha rendition of what will be later released as a set of tools for RPGs on the fly.">
+  <link rel="shortcut icon" href="/Site-Stuff/Assets/Images/golden_bed.ico">
+  <style>
+    /*All of the CSS beyond the basic*/
+
+  </style>
+</head>
+<body>
+    <header id="site-wide-nav-header">
+      
+    </header>
+    <main id="planner-main">
+        <button id="newTaskBtn">New Task :)</button>
+      
+      
+    </main>
+    <footer id="main-footer">
+
+    </footer>
+</body>
+<script src="/Site-Stuff/Scripting/Snippets/template_level_snippets.js"></script>
+<script>
+    // All of the scripts beyond the basics
+    // EventListener(s) for Button(s)
+    document.getElementById("newTaskBtn").addEventListener("click", () => {newTask()});
+    // Building the Tasks (Templates)
+    function newTask(){
+        function newPiacito() {
+
+            return 
+        }
+        let alllll = "hmmmmm";
+        let newTask = document.createElement("section");
+        let dataaa = document.createTextNode(`${alllll}`);
+        newTask.appendChild(dataaa);
+        let mainTag = document.getElementById("planner-main");
+        mainTag.appendChild(newTask);
+    };
+
+    // Populating the New Task Into Local Storage as a New Task in the Tasks array
+    function populateNewTaskIntoLocalStorage(){
+
+    }
+    // Populating the Tasks According to the Local Storage
+  
+    function populateTasksFromLocalStorage(){
+       
+    }
+    // This is what runs the code, allowing everything to update each set time.
+    // setInterval(() => {populateTasksFromLocalStorage()}, 1000);
+</script>
+</html>
