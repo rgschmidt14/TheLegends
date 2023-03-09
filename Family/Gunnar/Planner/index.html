@@ -27,8 +27,24 @@
 <script>
     // All of the scripts beyond the basics
     // EventListener(s) for Button(s)
-    document.getElementById("newTaskBtn").addEventListener("click", () => {newTask()});
+    document.getElementById("newTaskBtn").addEventListener("click", () => {newTaskFormPage()});
     // Building the Tasks (Templates)
+    function newTaskFormPage(){
+        window.location.href = "/Family/Gunnar/Planner/New_Task.html";
+    };
+
+    
+    // Populating the Tasks According to the Local Storage
+  
+    function populateTasksFromLocalStorage(){
+       
+    }
+    // This is what runs the code, allowing everything to update each set time.
+    // setInterval(() => {populateTasksFromLocalStorage()}, 1000);
+</script>
+</html>
+<!--
+    // Making a new task card on the page, *note: this will be where we order them too. another button will likely be made to help decide ascending or descending
     function newTask(){
         function newPiacito() {
 
@@ -46,12 +62,4 @@
     function populateNewTaskIntoLocalStorage(){
 
     }
-    // Populating the Tasks According to the Local Storage
-  
-    function populateTasksFromLocalStorage(){
-       
-    }
-    // This is what runs the code, allowing everything to update each set time.
-    // setInterval(() => {populateTasksFromLocalStorage()}, 1000);
-</script>
-</html>
+-->
