@@ -32,6 +32,8 @@ body {
     margin: auto;
     min-height: 100vh;
     padding-top: 5px;
+    min-width: min-content;
+    max-height: max-content;
 }
 
 
@@ -100,4 +102,10 @@ footer#main-footer {
     justify-content: center;
     margin: var(--VERTICAL_MARGIN) auto 0 auto; /* fix this */
      /* https://www.freecodecamp.org/news/how-to-keep-your-footer-where-it-belongs-59c6aa05c59c/ */
+}
+
+
+
+main.new-task-page input, main.new-task-page textarea {
+    max-width: calc(var(--SMALL_TEXT) * 25);
 }

@@ -9,13 +9,20 @@
     label:not([hidden]){
       display: block;
     }
+    /* body.new-task-page {
+      min-width: min-content;
+    } */
+    main.new-task-page {
+      margin: 0 1vw 0 1vw;
+    }
+    
   </style>
 </head>
-<body>
+<body class="new-task-page">
     <header id="site-wide-nav-header">
       
     </header>
-    <main>
+    <main class="new-task-page">
       <form>
         <fieldset>
           <legend>New Task</legend>
@@ -32,26 +39,34 @@
           <input name="cumulaNum" id="cumulaNum" type="number" step="10" hidden>
         </fieldset>
         <fieldset>
-          <label>Units of Measurement</label>
+          <label for="taskUnits">Units of Measurement</label>
           <select name="taskUnits" id="taskUnits" placeholder="Please Choose..." onchange="showTheThing('taskUnits', 'Custom Units', 'customUnits')">
             <option>Number (No Units)</option>
             <option>Custom Units</option>
             <option>Time</option>
           </select>
-          <label for="customUnits" id="customUnitsLabel" hidden>Custom Units</label>
+          <label for="taskQuantity">Quantity Needed to Complete</label>
+          <input name="taskQuantity" type="number" value="1">
+          <label for="customUnits" id="customUnitsLabel" hidden>Custom Units Name</label>
           <input name="customUnits" id="customUnits" type="text" hidden>
-          <label for="taskQuantity">Quantity Needed</label>
-          <input name="taskQuantity" type="number">
         </fieldset>
-        <label>Reset at this time of day<input name="taskHourReset" type="time"></label>
-        <label>Reset after this many days<input name="taskDayReset" type="number" value="1"></label>
-        <label>Time allowed for completion (beyond hour specified above)<input name="taskTimeAllowed" type="number"></label>
-        <label><input name="" type=""></label>
-        <label><input name="" type=""></label>
-        <label><textarea name="desc" id="desc" maxlength="555" placeholder="Write Description here"></textarea></label>
-
+        <fieldset>
+          <label for="taskHourReset">Reset at this time of day</label>
+          <input name="taskHourReset" type="time" value="06:00">
+          <label for="taskDayReset">Reset after this many days</label>
+          <input name="taskDayReset" type="number" value="1" size="">
+          <label for="taskTimeAllowed">Time allowed for completion (in minutes)</label>
+          <input name="taskTimeAllowed" type="number">
+        </fieldset>
+        <fieldset>
+          <label for=""></label>
+          <input name="" type="">
+          <label for=""></label>
+          <input name="" type="">
+          <label for="desc">Additional Notes:</label>
+          <textarea name="desc" id="desc" maxlength="555" placeholder="Write notes here..."></textarea>
+        </fieldset>
         <input type="submit" value="Submit">
-
       </form>
       
     </main>
