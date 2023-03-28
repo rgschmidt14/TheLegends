@@ -15,7 +15,19 @@
     main.new-task-page {
       margin: 0 1vw 0 1vw;
     }
-    
+    #submit-button {
+      font-size: 1em;
+      margin: 1em 1em 1em 1.5em;
+      height: fit-content;
+      transition-duration: 1s;
+      transition-property: margin;
+    }
+    @media(max-width: 364px){
+      #submit-button{
+        margin: 1em 50% 0 40%;
+        
+      }
+    }
   </style>
 </head>
 <body class="new-task-page">
@@ -26,7 +38,7 @@
       <form>
         <fieldset>
           <legend>New Task</legend>
-          <input name="taskName" type="text" maxlength="50" placeholder="Task Name Here">
+          <input name="taskName" type="text" maxlength="50" placeholder="Task Name Here" required>
         </fieldset>
         <fieldset id="lvlOfImportance">
           <label for="eminanceOfFailure">Eminance of Failure when missed</label>
@@ -59,14 +71,14 @@
           <input name="taskTimeAllowed" type="number">
         </fieldset>
         <fieldset>
-          <label for=""></label>
+          <!-- <label for=""></label>
           <input name="" type="">
           <label for=""></label>
-          <input name="" type="">
+          <input name="" type=""> -->
           <label for="desc">Additional Notes:</label>
           <textarea name="desc" id="desc" maxlength="555" placeholder="Write notes here..."></textarea>
         </fieldset>
-        <input type="submit" value="Submit">
+        <button id="submit-button">Submit</button>
       </form>
       
     </main>
@@ -76,6 +88,10 @@
 </body>
 <script src="/Site-Stuff/Scripting/Snippets/template_level_snippets.js"></script>
 <script>
+  // creating blank task list if none exists
+  if (!localStorage.getItem("Task-List")){
+    localStorage.setItem("Task-List", []);
+  }
   function showTheThing(theId, verifyText, theThingsId){
     let theThingOption = document.getElementById(`${theId}`).value;
     let theThing = document.getElementById(`${theThingsId}`);
@@ -84,15 +100,31 @@
     if(theThingOption === verifyText){
       theThing.removeAttribute("hidden");
       theThingsLabel.removeAttribute("hidden");
+      theThing.required = true;
+      theThingsLabel.required = true;
       console.log("Ohhh")
     } else {
       theThing.hidden = true;
       theThingsLabel.hidden = true;
+      theThing.removeAttribute("required");
+      theThingsLabel.removeAttribute("required");
       console.log("snap")
     }
   }
   function setUnitOfMeasurement(){
     let unitOption = document.getElementById("taskUnits")
   }
+
+  function replaceIfExists(theThing){
+    if(getItem.)
+  }
+
+  function storeFormData(){
+    console.log("yeah");
+  }
+  function displayTaskInfo(){
+
+  }
+  
 </script>
 </html>
