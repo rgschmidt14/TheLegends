@@ -48,27 +48,27 @@
             <option>Nugatory</option>
           </select>
           <label for="cumulaNum" id="cumulaNumLabel" hidden>Cumulative Limit Before Failure</label>
-          <input name="cumulaNum" id="cumulaNum" type="number" step="10" hidden>
+          <input name="cumulaNum" id="cumulaNum" type="number" step="1" hidden>
         </fieldset>
         <fieldset>
           <label for="taskUnits">Units of Measurement</label>
-          <select name="taskUnits" id="taskUnits" placeholder="Please Choose..." onchange="showTheThing('taskUnits', 'Custom Units', 'customUnits')">
+          <select name="taskUnits" id="taskUnits" placeholder="Please Choose..." onchange="showTheThing('taskUnits', 'Custom Units', 'customUnits')" required>
             <option>Number (No Units)</option>
             <option>Custom Units</option>
             <option>Time</option>
           </select>
           <label for="taskQuantity">Quantity Needed to Complete</label>
-          <input name="taskQuantity" type="number" value="1">
+          <input name="taskQuantity" type="number" value="1" required>
           <label for="customUnits" id="customUnitsLabel" hidden>Custom Units Name</label>
           <input name="customUnits" id="customUnits" type="text" hidden>
         </fieldset>
         <fieldset>
           <label for="taskHourReset">Reset at this time of day</label>
-          <input name="taskHourReset" type="time" value="06:00">
+          <input name="taskHourReset" type="time" value="06:00"> <!--note, be sure to make this one automatically reset at midnight if no number is given...somehow.-->
           <label for="taskDayReset">Reset after this many days</label>
-          <input name="taskDayReset" type="number" value="1" size="">
+          <input name="taskDayReset" type="number" value="1" size="" required>
           <label for="taskTimeAllowed">Time allowed for completion (in minutes)</label>
-          <input name="taskTimeAllowed" type="number">
+          <input name="taskTimeAllowed" type="number" required>
         </fieldset>
         <fieldset>
           <!-- <label for=""></label>
@@ -78,7 +78,7 @@
           <label for="desc">Additional Notes:</label>
           <textarea name="desc" id="desc" maxlength="555" placeholder="Write notes here..."></textarea>
         </fieldset>
-        <button id="submit-button">Submit</button>
+        <button id="submit-button" onclick="getAndSetParams(event)">Submit</button>
       </form>
       
     </main>
@@ -88,10 +88,47 @@
 </body>
 <script src="/Site-Stuff/Scripting/Snippets/template_level_snippets.js"></script>
 <script>
-  // creating blank task list if none exists
-  if (!localStorage.getItem("Task-List")){
-    localStorage.setItem("Task-List", []);
+  //filling inputs if available
+  let params = new URLSearchParams(window.location.search);
+  let currentTask = params.get("taskName");
+  if(currentTask){
+    console.log(`1. ${localStorage.getItem("Task-List")}`)
+    let taskInfo = JSON.parse(localStorage.getItem("Task-List"));
+    console.log(`2. ${taskInfo}`)
   }
+  function getAndSetParams(event) {
+    // Prevent the default form submission behavior
+    event.preventDefault();
+    // Create a new object to store the form data
+    let newTask = {};
+
+    // Get the values from the form and add them to the new object
+    newTask.eminanceOfFailure = params.get("eminanceOfFailure");
+    newTask.cumulaNum = params.get("cumulaNum");
+    newTask.taskUnits = params.get("taskUnits");
+    newTask.taskQuantity = params.get("taskQuantity");
+    newTask.customUnits = params.get("customUnits");
+    newTask.taskHourReset = params.get("taskHourReset");
+    newTask.taskDayReset = params.get("taskDayReset");
+    newTask.taskTimeAllowed = params.get("taskTimeAllowed");
+    newTask.desc = params.get("desc");
+
+    // Get the current list of tasks from localStorage
+    let taskList = {};
+    if (localStorage.getItem("Task-List")) {
+      taskList = JSON.parse(localStorage.getItem("Task-List"));
+    }
+
+    // Set the new task in the taskList object
+    taskList[newTask.taskName] = newTask;
+
+    // Store the updated list back in localStorage
+    localStorage.setItem("Task-List", JSON.stringify(taskList));
+  }
+
+  // getAndSetParams();
+
+
   function showTheThing(theId, verifyText, theThingsId){
     let theThingOption = document.getElementById(`${theId}`).value;
     let theThing = document.getElementById(`${theThingsId}`);
@@ -115,9 +152,7 @@
     let unitOption = document.getElementById("taskUnits")
   }
 
-  function replaceIfExists(theThing){
-    if(getItem.)
-  }
+  
 
   function storeFormData(){
     console.log("yeah");
@@ -128,3 +163,4 @@
   
 </script>
 </html>
+<!-- cumulaNum=5&taskUnits=Number+%28No+Units%29&taskQuantity=30&customUnits=&taskHourReset=06%3A00&taskDayReset=1&taskTimeAllowed=1440&desc= -->

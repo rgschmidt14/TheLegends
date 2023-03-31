@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head id="head">
+  <!--Page Data-->
+  <title>Schmidts.Page</title>
+  <meta name="description" content="Schmidts.Page is an Alpha rendition of what will be later released as a set of tools for RPGs on the fly.">
+  <link rel="shortcut icon" href="/Site-Stuff/Assets/Images/golden_bed.ico">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+    }
+  
+    h1 {
+      color: #333;
+      font-size: 24px;
+      text-align: center;
+    }
+  
+    p {
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+  
+    .button {
+      display: inline-block;
+      padding: .25em;
+      background-color: #007bff;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 4px;
+      height: max-content;
+    }
+  
+    .button:hover {
+      background-color: #0069d9;
+    }
+  </style>
+  
+</head>
+<body>
+    <header id="site-wide-nav-header">
+        
+    </header>
+    <main>
+        <label for="userInput">Enter dice roll:</label>
+        <input type="text" id="userInput">
+        <button class="button" id="rollDiceBtn">Roll Dice</button>
+        
+        <label for="minVal">Enter minimum value:</label>
+        <input type="number" id="minVal">
+        <label for="maxVal">Enter maximum value:</label>
+        <input type="number" id="maxVal">
+        <button class="button" id="rollAbilitiesBtn">Roll Abilities</button>
+        
+        <p id="resultDisplay"></p>
+      
+    </main>
+    <footer id="main-footer">
+
+    </footer>
+</body>
+<script src="/Site-Stuff/Scripting/Snippets/template_level_snippets.js"></script>
+<script>
+    // Function to roll the dice
+    function rollDice() {
+      // Get the user input
+      const userInput = document.getElementById('userInput').value;
+      // Split the input to get the number of dice and the number of sides
+      const [numDice, numSides] = userInput.split('d');
+      // Roll the dice and get the total
+      let total = 0;
+      for (let i = 0; i < numDice; i++) {
+        total += Math.floor(Math.random() * numSides) + 1;
+      }
+      // Display the result to the user
+      const resultDisplay = document.getElementById('resultDisplay');
+      resultDisplay.textContent = `You rolled a total of ${total}.`;
+    }
+    
+    // Function to roll abilities
+
+    function rollAbilities() {
+        const minVal = Number(document.getElementById('minVal').value);
+        const maxVal = Number(document.getElementById('maxVal').value);
+        const resultDisplay = document.getElementById('resultDisplay');
+        let abilities = [];
+        let tries = 0;
+        while (abilities.length < 6 || abilities.reduce((acc, val) => acc + val) < minVal || abilities.reduce((acc, val) => acc + val) > maxVal) {
+            tries++;
+            abilities = [];
+            for (let i = 0; i < 6; i++) {
+            let rolls = [];
+            for (let j = 0; j < 4; j++) {
+                rolls.push(Math.floor(Math.random() * 6) + 1);
+            }
+            rolls.sort((a, b) => b - a);
+            abilities.push(rolls[0] + rolls[1] + rolls[2]);
+            }
+            abilities.sort((a, b) => b - a);
+        }
+        resultDisplay.textContent = `You rolled abilities: ${abilities.join(', ')}. It took ${tries} tries ${String.fromCodePoint(0x1F603)}`;
+    }
+
+
+
+    // function rollAbilities() {
+    // const minVal = Number(document.getElementById('minVal').value);
+    // const maxVal = Number(document.getElementById('maxVal').value);
+    // const resultDisplay = document.getElementById('resultDisplay');
+    // let abilities = [];
+    // for (let i = 0; i < 6; i++) {
+    //     let rolls = [];
+    //     for (let j = 0; j < 4; j++) {
+    //     rolls.push(Math.floor(Math.random() * 6) + 1);
+    //     }
+    //     rolls.sort((a, b) => b - a);
+    //     let total = rolls[0] + rolls[1] + rolls[2];
+    //     abilities.push(total);
+    // }
+    // abilities.sort((a, b) => b - a);
+    // let sum = abilities.reduce((a, b) => a + b);
+    // if (sum < minVal * 6 || sum > maxVal * 6) {
+    //     resultDisplay.textContent = `Sorry, your total ability score is not within the range of ${minVal * 6} to ${maxVal * 6}. Please try again.`;
+    //     return;
+    // }
+    // let listItems = abilities.map(ability => `<li>${ability}</li>`).join('');
+    // resultDisplay.innerHTML = `<p>You rolled abilities:</p><ul>${listItems}</ul>`;
+    // }
+    
+    // Add event listeners to the buttons
+    document.getElementById('rollDiceBtn').addEventListener('click', rollDice);
+    document.getElementById('rollAbilitiesBtn').addEventListener('click', rollAbilities);
+</script>
+</html>
