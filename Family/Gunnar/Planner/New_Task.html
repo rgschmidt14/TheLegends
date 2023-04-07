@@ -38,7 +38,7 @@
       <form>
         <fieldset>
           <legend>New Task</legend>
-          <input name="taskName" type="text" maxlength="50" placeholder="Task Name Here" required>
+          <input name="taskName" id="taskName" type="text" maxlength="50" placeholder="Task Name Here" required>
         </fieldset>
         <fieldset id="lvlOfImportance">
           <label for="eminanceOfFailure">Eminance of Failure when missed</label>
@@ -58,17 +58,17 @@
             <option>Time</option>
           </select>
           <label for="taskQuantity">Quantity Needed to Complete</label>
-          <input name="taskQuantity" type="number" value="1" required>
+          <input name="taskQuantity" id="taskQuantity" type="number" value="1" required>
           <label for="customUnits" id="customUnitsLabel" hidden>Custom Units Name</label>
           <input name="customUnits" id="customUnits" type="text" hidden>
         </fieldset>
         <fieldset>
           <label for="taskHourReset">Reset at this time of day</label>
-          <input name="taskHourReset" type="time" value="06:00"> <!--note, be sure to make this one automatically reset at midnight if no number is given...somehow.-->
+          <input name="taskHourReset" id="taskHourReset" type="time" value="06:00"> <!--note, be sure to make this one automatically reset at midnight if no number is given...somehow.-->
           <label for="taskDayReset">Reset after this many days</label>
-          <input name="taskDayReset" type="number" value="1" size="" required>
+          <input name="taskDayReset" id="taskDayReset" type="number" value="1" size="" required>
           <label for="taskTimeAllowed">Time allowed for completion (in minutes)</label>
-          <input name="taskTimeAllowed" type="number" required>
+          <input name="taskTimeAllowed" id="taskTimeAllowed" type="number" required>
         </fieldset>
         <fieldset>
           <!-- <label for=""></label>
@@ -96,34 +96,74 @@
     let taskInfo = JSON.parse(localStorage.getItem("Task-List"));
     console.log(`2. ${taskInfo}`)
   }
+  function formatDuration(seconds) {
+    let days = Math.floor(seconds / (3600 * 24));
+    let hours = Math.floor((seconds % (3600 * 24)) / 3600);
+    let minutes = Math.floor((seconds % 3600) / 60);
+    let remainingSeconds = seconds % 60;
+    
+    let result = '';
+    if (days > 0) {result += days + ':';}
+    if (hours > 0 || days > 0) {if (hours < 10) {result += '0';} result += hours + ':';}
+    if (minutes > 0 || hours > 0 || days > 0) {if (minutes < 10) {result += '0';} result += minutes + ':';}
+    if (remainingSeconds < 10) {result += '0';}
+    result += remainingSeconds;
+    
+    return result;
+  }
   function getAndSetParams(event) {
     // Prevent the default form submission behavior
+    console.log("working");
     event.preventDefault();
     // Create a new object to store the form data
     let newTask = {};
 
-    // Get the values from the form and add them to the new object
-    newTask.eminanceOfFailure = params.get("eminanceOfFailure");
-    newTask.cumulaNum = params.get("cumulaNum");
-    newTask.taskUnits = params.get("taskUnits");
-    newTask.taskQuantity = params.get("taskQuantity");
-    newTask.customUnits = params.get("customUnits");
-    newTask.taskHourReset = params.get("taskHourReset");
-    newTask.taskDayReset = params.get("taskDayReset");
-    newTask.taskTimeAllowed = params.get("taskTimeAllowed");
-    newTask.desc = params.get("desc");
+    //////////////Getting values from the form and add them to the new object/////////////////
+    newTask.taskName = document.querySelector('#taskName').value;
+    newTask.eminanceOfFailure = document.querySelector('#eminanceOfFailure').value;
+    newTask.cumulaNum = document.querySelector('#cumulaNum').value;
+    newTask.taskUnits = document.querySelector('#taskUnits').value;
+    newTask.taskQuantity = document.querySelector('#taskQuantity').value;
+    newTask.customUnits = document.querySelector('#customUnits').value;
+    newTask.taskHourReset = document.querySelector('#taskHourReset').value;
+    newTask.taskDayReset = document.querySelector('#taskDayReset').value;
+    newTask.taskTimeAllowed = document.querySelector('#taskTimeAllowed').value;
+    newTask.desc = document.querySelector('#desc').value;
+    newTask.lastCompleted = new Date;
+    newTask.backgroundColor = "white";
+    /////////////////////////// getting time difference////////////////////////
+    // Get the current time in hours and minutes
+    const now = new Date();
+    const currentHours = now.getHours();
+    const currentMinutes = now.getMinutes();
 
-    // Get the current list of tasks from localStorage
-    let taskList = {};
-    if (localStorage.getItem("Task-List")) {
-      taskList = JSON.parse(localStorage.getItem("Task-List"));
-    }
+    // Get the user-specified date and time in hours and minutes
+    console.log(newTask.taskHourReset);
+    const userInputTime = newTask.taskHourReset;
+    const timeParts = userInputTime.split(":");
+    const userDays = newTask.taskDayReset;
+    const userHours = parseInt(timeParts[0]);
+    const userMinutes = parseInt(timeParts[1]);
 
-    // Set the new task in the taskList object
+    // Calculate the difference in Seconds then converting back to days hours minutes seconds
+    const differenceInSeconds = ((userDays - 1) * 60 * 24 + (userHours - currentHours) * 60 + (userMinutes - currentMinutes)) * 60;
+
+    newTask.timeRemaining = differenceInSeconds;
+    newTask.originalTimeRemaining = differenceInSeconds;
+    
+
+
+    // Get the existing task list from localStorage or initialize it as an empty object
+    let taskList = JSON.parse(localStorage.getItem('Task-List')) || {};
+
+    // Add the new task to the task list using the task name as the key
     taskList[newTask.taskName] = newTask;
 
-    // Store the updated list back in localStorage
-    localStorage.setItem("Task-List", JSON.stringify(taskList));
+    // Save the updated task list back to localStorage
+    localStorage.setItem('Task-List', JSON.stringify(taskList));
+
+    // Navigate to the task list page
+    window.location.href = '/Family/Gunnar/Planner/New_Task.html';
   }
 
   // getAndSetParams();
@@ -148,9 +188,9 @@
       console.log("snap")
     }
   }
-  function setUnitOfMeasurement(){
-    let unitOption = document.getElementById("taskUnits")
-  }
+  // function setUnitOfMeasurement(){
+  //   let unitOption = document.getElementById("taskUnits")
+  // }
 
   
 

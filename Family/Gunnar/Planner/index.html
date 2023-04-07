@@ -15,8 +15,8 @@
       
     </header>
     <main id="planner-main">
-        <button id="newTaskBtn">New Task :)</button>
-      
+        <button id="newTaskBtn" onclick="window.location.href = '/Family/Gunnar/Planner/New_Task.html'">New Task :)</button>
+        <section id="taskList"></section>
       
     </main>
     <footer id="main-footer">
@@ -25,41 +25,149 @@
 </body>
 <script src="/Site-Stuff/Scripting/Snippets/template_level_snippets.js"></script>
 <script>
-    // All of the scripts beyond the basics
-    // EventListener(s) for Button(s)
-    document.getElementById("newTaskBtn").addEventListener("click", () => {newTaskFormPage()});
-    // Building the Tasks (Templates)
-    function newTaskFormPage(){
-        window.location.href = "/Family/Gunnar/Planner/New_Task.html";
-    };
-
-    
-    // Populating the Tasks According to the Local Storage
-  
-    function populateTasksFromLocalStorage(){
-       
+    function formatDuration(seconds) {
+        let days = Math.floor(seconds / (3600 * 24));
+        let hours = Math.floor((seconds % (3600 * 24)) / 3600);
+        let minutes = Math.floor((seconds % 3600) / 60);
+        let remainingSeconds = seconds % 60;
+        
+        let result = '';
+        if (days > 0) {result += days + ':';}
+        if (hours > 0 || days > 0) {if (hours < 10) {result += '0';} result += hours + ':';}
+        if (minutes > 0 || hours > 0 || days > 0) {if (minutes < 10) {result += '0';} result += minutes + ':';}
+        if (remainingSeconds < 10) {result += '0';}
+        result += remainingSeconds;
+        
+        return result;
     }
+    function convertTimeToSeconds(timeString) {
+            let splitTimes = timeString.split(':');
+            let t1 = splitTimes[0];
+            let t2 = splitTimes[1];
+            let t3 = splitTimes[2];
+            let t4 = splitTimes[3];
+        if(timeString.length > 8) {
+            // days included
+            return (t1 * 24 * 60 * 60 + t2 * 60 * 60 + t3 * 60 + t4) / 100
+        } else if (timeString.length > 5) {
+            // hours included but not days
+            return (t1 * 60 * 60 + t2 * 60 + t3) / 100
+        } else if (timeString.length > 2) {
+            // minutes included but not hours nor days
+            return (t1 * 60 + t2) / 100
+        } else {
+            // only seconds present
+            return timeString
+        }
+    }
+
+    function updateTaskList() {
+        let taskList = JSON.parse(localStorage.getItem('Task-List'));
+
+        // Get the current date/time
+        let now = new Date();
+
+        // Loop through each task in the task list
+        for (let taskName in taskList) {
+            let task = taskList[taskName];
+
+            // Calculate the number of seconds since the last completion time
+            let lastCompleted = new Date(task.lastCompleted);
+            let secondsPassed = Math.floor((now - lastCompleted) / 1000);
+            // Subtract the number of seconds passed from the original time remaining
+            let timeRemainingSeconds = task.originalTimeRemaining;
+            timeRemainingSeconds -= secondsPassed;
+            // timeRemainingSeconds = Math.max(0, timeRemainingSeconds);
+
+
+            // Convert the time remaining back to the "dd:hh:mm:ss" format if timeRemainingSeconds > 0
+            let timeRemaining = '';
+            if (timeRemainingSeconds > 0) {
+            // timeRemaining = formatDuration(timeRemainingSeconds);
+            }
+            timeRemaining = formatDuration(timeRemainingSeconds);
+            // Update the timeRemaining value in the task object
+            task.timeRemaining = timeRemaining;
+            
+
+            // changing background color as needed
+            let needsChanged = False;
+            let currentBackgroundColor = task.backgroundColor;
+            if((task.taskTimeAllowed * -1) > timeRemainingSeconds) {
+                // add a count to the failure count up to the max number of failures
+
+                //reset the time created to right now
+
+            } else {
+                //subtract a count from the failure count down to zero as the minimum, no negative numbers
+
+            }
+            if ((task.taskTimeAllowed * 60 / 2) < timeRemainingSeconds) {
+                correctBackgroundColor = "lightgreen";
+            } else if () {
+                correctBackgroundColor = "lightyellow";
+            } else if () {
+                correctBackgroundColor = "lightred";
+            } else {
+                correctBackgroundColor = "white";
+            }
+            // recoloring based on failures reached
+            // if the failures are at half of their max or more mark it one shade darker (closer to red) than it would usually be marked, eg. green goes to yellow, yellow to red, red to black.
+            
+            
+            if (currentBackgroundColor == correctBackgroundColor) {
+                needsChanged = True;
+            }
+            if(needsChanged) {
+                currentBackgroundColor = correctBackgroundColor
+            }
+
+        }
+
+        // Save the updated task list back to local storage
+        localStorage.setItem('Task-List', JSON.stringify(taskList));
+    }
+
+    updateTaskList();
+    // Populate the tasks according to the Local Storage
+    function populateTasksFromLocalStorage() {
+        const taskList = JSON.parse(localStorage.getItem("Task-List"));
+        const taskListSection = document.getElementById("taskList");
+        taskListSection.innerHTML = "";
+
+        // Loop through each task in the task list
+        for (const task in taskList) {
+            // Create a new stackable card for the task
+            const taskCard = document.createElement("section");
+            taskCard.classList.add("stackable-card");
+            taskCard.innerHTML = `
+            <section class="task-card">
+                <h2>${taskList[task].taskName}</h2>
+                <p class="task-item-eminanceOfFailure">Eminence of Failure: ${taskList[task].eminanceOfFailure}</p>
+                <p class="task-item-cumulaNum">Cumulative Number: ${taskList[task].cumulaNum}</p>
+                <p class="task-item-taskUnits">Task Units: ${taskList[task].taskUnits}</p>
+                <p class="task-item-taskQuantity">Task Quantity: ${taskList[task].taskQuantity}</p>
+                <p class="task-item-customUnits">Custom Units: ${taskList[task].customUnits}</p>
+                <p class="task-item-taskHourReset">Task Hour Reset: ${taskList[task].taskHourReset}</p>
+                <p class="task-item-taskDayReset">Task Day Reset: ${taskList[task].taskDayReset}</p>
+                <p class="task-item-taskTimeAllowed">Task Time Allowed: ${taskList[task].taskTimeAllowed}</p>
+                <p class="task-item-timeRemaining">Time Remaining: ${taskList[task].timeRemaining}</p>
+                <p class="task-item-originalTimeRemaining">Original Time Remaining: ${taskList[task].originalTimeRemaining}</p>
+                <p class="task-item-lastCompleted">Last Completed: ${taskList[task].lastCompleted}</p>
+                <p class="task-item-desc">Description: ${taskList[task].desc}</p>
+            </section>
+
+            `;
+            // Add the task card to the task list
+            taskListSection.appendChild(taskCard);
+        }
+    }
+
+    // Call the populateTasksFromLocalStorage function to initially populate the task list
+    populateTasksFromLocalStorage();
+
     // This is what runs the code, allowing everything to update each set time.
     // setInterval(() => {populateTasksFromLocalStorage()}, 1000);
+
 </script>
 </html>
-<!--
-    // Making a new task card on the page, *note: this will be where we order them too. another button will likely be made to help decide ascending or descending
-    function newTask(){
-        function newPiacito() {
-
-            return 
-        }
-        let alllll = "hmmmmm";
-        let newTask = document.createElement("section");
-        let dataaa = document.createTextNode(`${alllll}`);
-        newTask.appendChild(dataaa);
-        let mainTag = document.getElementById("planner-main");
-        mainTag.appendChild(newTask);
-    };
-
-    // Populating the New Task Into Local Storage as a New Task in the Tasks array
-    function populateNewTaskIntoLocalStorage(){
-
-    }
--->
