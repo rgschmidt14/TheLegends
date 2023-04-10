@@ -91,7 +91,7 @@
             
 
             // changing background color as needed
-            let needsChanged = False;
+            let needsChanged = false;
             let currentBackgroundColor = task.backgroundColor;
             if((task.taskTimeAllowed * -1) > timeRemainingSeconds) {
                 // add a count to the failure count up to the max number of failures
@@ -104,9 +104,9 @@
             }
             if ((task.taskTimeAllowed * 60 / 2) < timeRemainingSeconds) {
                 correctBackgroundColor = "lightgreen";
-            } else if () {
+            } else if ((task.taskTimeAllowed * 60 / 2) >= timeRemainingSeconds && timeRemainingSeconds > 0) {
                 correctBackgroundColor = "lightyellow";
-            } else if () {
+            } else if (timeRemainingSeconds <= 0) {
                 correctBackgroundColor = "lightred";
             } else {
                 correctBackgroundColor = "white";
@@ -116,7 +116,7 @@
             
             
             if (currentBackgroundColor == correctBackgroundColor) {
-                needsChanged = True;
+                needsChanged = true;
             }
             if(needsChanged) {
                 currentBackgroundColor = correctBackgroundColor
