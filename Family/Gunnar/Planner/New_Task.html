@@ -49,6 +49,8 @@
           </select>
           <label for="cumulaNum" id="cumulaNumLabel" hidden>Cumulative Limit Before Failure</label>
           <input name="cumulaNum" id="cumulaNum" type="number" step="1" hidden>
+          <label for="failures" id="failuresLabel" hidden>Failures so far</label>
+          <input name="failures" id="failures" type="number" step="1" value="0" hidden>
         </fieldset>
         <fieldset>
           <label for="taskUnits">Units of Measurement</label>
@@ -129,6 +131,7 @@
     newTask.taskDayReset = document.querySelector('#taskDayReset').value;
     newTask.taskTimeAllowed = document.querySelector('#taskTimeAllowed').value;
     newTask.desc = document.querySelector('#desc').value;
+    newTask.numberOfFailures = document.querySelector('#failures').value;
     newTask.lastCompleted = new Date;
     newTask.backgroundColor = "white";
     /////////////////////////// getting time difference////////////////////////
@@ -146,9 +149,13 @@
     const userMinutes = parseInt(timeParts[1]);
 
     // Calculate the difference in Seconds then converting back to days hours minutes seconds
-    const differenceInSeconds = ((userDays - 1) * 60 * 24 + (userHours - currentHours) * 60 + (userMinutes - currentMinutes)) * 60;
+    let differenceInSeconds = ((userDays - 1) * 60 * 24 + (userHours - currentHours) * 60 + (userMinutes - currentMinutes)) * 60;
 
+    if (differenceInSeconds <= 0) {
+      differenceInSeconds = ((24*60*60) + differenceInSeconds);
+    }
     newTask.timeRemaining = differenceInSeconds;
+    newTask.timeRemainingVisualized = formatDuration(differenceInSeconds);
     newTask.originalTimeRemaining = differenceInSeconds;
     
 
