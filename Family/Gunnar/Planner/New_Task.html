@@ -6,6 +6,11 @@
   <meta name="description" content="Schmidts.Page is an Alpha rendition of what will be later released as a set of tools for RPGs on the fly.">
   <link rel="shortcut icon" href="/Site-Stuff/Assets/Images/golden_bed.ico">
   <style>
+    main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+
+    }
     label:not([hidden]){
       display: block;
     }
@@ -27,6 +32,11 @@
         margin: 1em 50% 0 40%;
         
       }
+      main {
+        display: grid;
+        grid-template-columns: 1fr;
+      
+      }
     }
   </style>
 </head>
@@ -35,6 +45,7 @@
       
     </header>
     <main class="new-task-page">
+      <a id="go-back-btn" href="/Family/Gunnar/Planner/"><button class="mainBtn">Back to Task List</button></a>
       <form>
         <fieldset>
           <legend>New Task</legend>
