@@ -7,7 +7,30 @@
   <link rel="shortcut icon" href="/Site-Stuff/Assets/Images/golden_bed.ico">
   <style>
     /*All of the CSS beyond the basic*/
-
+    main .mainBtn {
+        width: 80%;
+    }
+    main#planner-main {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+    .task-card h2 {
+        margin: 0 1.5vw 1.5vh 2vw;
+        padding-top: .75vh;
+    }
+    .task-card summary {
+        display: grid;
+        grid-template-columns: 1fr .5fr .5fr 1.5fr 1.5fr;
+        justify-items: center;
+        padding-bottom: .75vh;
+    }
+    .task-card {
+        max-width: 364px;
+        margin: auto;
+    }
+    #taskList {
+        grid-column: 1/4;
+    }
   </style>
 </head>
 <body>
@@ -15,7 +38,9 @@
       
     </header>
     <main id="planner-main">
-        <button id="newTaskBtn" onclick="window.location.href = '/Family/Gunnar/Planner/New_Task.html'">New Task :)</button>
+        <button id="" class="mainBtn" onclick="() => {console.log('editTasks()')}">Edit</button>
+        <button id="newTaskBtn"  class="mainBtn" onclick="window.location.href = '/Family/Gunnar/Planner/New_Task.html'">New Task :)</button>
+        <button id="reOrder" class="mainBtn" onclick="() => {console.log('reverseOrder()')}">Reverse Order</button>
         <section id="taskList"></section>
       
     </main>
@@ -194,27 +219,45 @@
             // Create a new stackable card for the task
             const taskCard = document.createElement("section");
             taskCard.classList.add("stackable-card");
-            taskCard.innerHTML = `
-            <section class="task-card" id="${taskList[task].taskName}">
-                <h2>${taskList[task].taskName}</h2>
-                <p class="task-item-eminanceOfFailure">Eminence of Failure: ${taskList[task].eminanceOfFailure}</p>
-                <p class="task-item-cumulaNum">Cumulative Number: ${taskList[task].cumulaNum}</p>
-                <p class="task-item-numberOfFailures">Number of Failures: ${taskList[task].numberOfFailures}</p>
-                <p class="task-item-taskUnits">Task Units: ${taskList[task].taskUnits}</p>
-                <p class="task-item-taskQuantity">Task Quantity: ${taskList[task].taskQuantity}</p>
-                <p class="task-item-customUnits">Custom Units: ${taskList[task].customUnits}</p>
-                <p class="task-item-taskHourReset">Task Hour Reset: ${taskList[task].taskHourReset}</p>
-                <p class="task-item-taskDayReset">Task Day Reset: ${taskList[task].taskDayReset}</p>
-                <p class="task-item-taskTimeAllowed">Task Time Allowed: ${taskList[task].taskTimeAllowed}</p>
-                <p class="task-item-timeRemaining">Time Remaining: ${taskList[task].timeRemaining}</p>
-                <p class="task-item-timeRemainingVisualized">Time Remaining Visualized: ${taskList[task].timeRemainingVisualized}</p>
-                <p class="task-item-originalTimeRemaining">Original Time Remaining: ${taskList[task].originalTimeRemaining}</p>
-                <p class="task-item-backgroundColor">Background Color: ${taskList[task].backgroundColor}</p>
-                <p class="task-item-lastCompleted">Last Completed: ${taskList[task].lastCompleted}</p>
-                <p class="task-item-desc">Description: ${taskList[task].desc}</p>
-            </section>
-
-            `;
+            let debug = false;
+            if (debug == true) {
+                taskCard.innerHTML = `
+                <section class="task-card" id="${taskList[task].taskName}">
+                    <h2>${taskList[task].taskName}</h2>
+                    <p class="task-item-debug tid-eminanceOfFailure">Eminence of Failure: ${taskList[task].eminanceOfFailure}</p>
+                    <p class="task-item-debug tid-cumulaNum">Cumulative Number: ${taskList[task].cumulaNum}</p>
+                    <p class="task-item-debug tid-numberOfFailures">Number of Failures: ${taskList[task].numberOfFailures}</p>
+                    <p class="task-item-debug tid-taskUnits">Task Units: ${taskList[task].taskUnits}</p>
+                    <p class="task-item-debug tid-taskQuantity">Task Quantity: ${taskList[task].taskQuantity}</p>
+                    <p class="task-item-debug tid-customUnits">Custom Units: ${taskList[task].customUnits}</p>
+                    <p class="task-item-debug tid-taskHourReset">Task Hour Reset: ${taskList[task].taskHourReset}</p>
+                    <p class="task-item-debug tid-taskDayReset">Task Day Reset: ${taskList[task].taskDayReset}</p>
+                    <p class="task-item-debug tid-taskTimeAllowed">Task Time Allowed: ${taskList[task].taskTimeAllowed}</p>
+                    <p class="task-item-debug tid-timeRemaining">Time Remaining: ${taskList[task].timeRemaining}</p>
+                    <p class="task-item-debug tid-timeRemainingVisualized">Time Remaining Visualized: ${taskList[task].timeRemainingVisualized}</p>
+                    <p class="task-item-debug tid-originalTimeRemaining">Original Time Remaining: ${taskList[task].originalTimeRemaining}</p>
+                    <p class="task-item-debug tid-backgroundColor">Background Color: ${taskList[task].backgroundColor}</p>
+                    <p class="task-item-debug tid-lastCompleted">Last Completed: ${taskList[task].lastCompleted}</p>
+                    <p class="task-item-debug tid-desc">Description: ${taskList[task].desc}</p>
+                </section>
+                `;
+            } else {
+                taskCard.innerHTML = `
+                <section class="task-card" id="${taskList[task].taskName}">
+                    <h2>${taskList[task].taskName}</h2>
+                    <details>
+                        <summary>
+                            <img height="25x" width="25px">
+                            <button class="task-item upBtn" id="upBtn">&#8593;</button>
+                            <button class="task-item downBtn" id="downBtn">&#8595;</button>
+                            <span class="task-item quantityRatioVisualized">${taskList[task].quantityCompleted}/${taskList[task].taskQuantity} ${taskList[task].customUnits}</span>
+                            <span class="task-item timeRemainingVisualized">${taskList[task].timeRemainingVisualized}</span>
+                        </summary>
+                        <p class="task-item desc">${taskList[task].desc}</p>
+                    </details>
+                </section>
+                `;
+            }
             // Add the task card to the task list
             taskListSection.appendChild(taskCard);
 

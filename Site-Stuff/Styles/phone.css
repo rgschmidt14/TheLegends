@@ -85,7 +85,7 @@ main {
 main a {
     text-decoration: none;
 }
-main button {
+main button.mainBtn {
     display: flex;
     justify-content: center;
     align-items: center;
