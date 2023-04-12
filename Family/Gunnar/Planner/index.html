@@ -31,6 +31,10 @@
     #taskList {
         grid-column: 1/4;
     }
+
+    .hidden {
+        display: none;
+    }
   </style>
 </head>
 <body>
@@ -86,6 +90,16 @@
         }
     }
 
+    function calculateTimePassed(now, task) {
+        // Calculate the number of seconds since the last completion time
+        let lastCompleted = new Date(task.lastCompleted);
+        let secondsPassed = Math.floor((now - lastCompleted) / 1000);
+        // Subtract the number of seconds passed from the original time remaining
+        let timeRemainingSeconds = task.originalTimeRemaining;
+        timeRemainingSeconds -= secondsPassed;
+
+        return timeRemainingSeconds;
+    }
     function updateTaskList() {
         let taskList = JSON.parse(localStorage.getItem('Task-List'));
 
@@ -96,27 +110,13 @@
         for (let taskName in taskList) {
             let task = taskList[taskName];
 
-            // Calculate the number of seconds since the last completion time
-            let lastCompleted = new Date(task.lastCompleted);
-            let secondsPassed = Math.floor((now - lastCompleted) / 1000);
-            // Subtract the number of seconds passed from the original time remaining
+            task.timeRemaining = calculateTimePassed(now, task)
             let timeRemainingSeconds = task.originalTimeRemaining;
-            timeRemainingSeconds -= secondsPassed;
-            // timeRemainingSeconds = Math.max(0, timeRemainingSeconds);
 
-
-            // Convert the time remaining back to the "dd:hh:mm:ss" format if timeRemainingSeconds > 0
-            let timeRemaining = '';
-            if (timeRemainingSeconds > 0) {
-            // timeRemaining = formatDuration(timeRemainingSeconds);
-            }
-            timeRemaining = timeRemainingSeconds;
-            // Update the timeRemaining value in the task object
-            task.timeRemaining = timeRemaining;
-            if (timeRemaining >= 0) {
-                task.timeRemainingVisualized = formatDuration(timeRemaining);
+            if (task.timeRemaining >= 0) {
+                task.timeRemainingVisualized = formatDuration(task.timeRemaining);
             } else {
-                let inverseTimeRemaining = (-1 * timeRemaining)
+                let inverseTimeRemaining = (-1 * task.timeRemaining)
                 task.timeRemainingVisualized = formatDuration(inverseTimeRemaining)
                 task.timeRemainingVisualized = "-" + task.timeRemainingVisualized;
             }
@@ -206,7 +206,63 @@
         localStorage.setItem('Task-List', JSON.stringify(taskList));
     }
 
+    function revertTaskCard(taskName) {
+        let taskList = JSON.parse(localStorage.getItem('Task-List'));
+        let task = taskList[taskName];
+        document.getElementById(`${taskName}`).innerHTML = `
+            <h2>${taskName}</h2>
+            <div id="changingContentContainer-${taskName}">
+                <details id="changingContentRegular-${taskName}">
+                    <summary>
+                        <img height="25x" width="25px">
+                        <button class="task-item upBtn" data-taskname="${taskList[task].taskName}">&#8593;</button>
+                        <button class="task-item downBtn" data-taskname="${taskList[task].taskName}">&#8595;</button>
+                        <span class="task-item quantityRatioVisualized">${taskList[task].quantityCompleted}/${taskList[task].taskQuantity} ${taskList[task].customUnits}</span>
+                        <span class="task-item timeRemainingVisualized">${taskList[task].timeRemainingVisualized}</span>
+                    </summary>
+                    <p class="task-item desc">${taskList[task].desc}</p>
+                </details>
+                <div id="changingContentCompleteQ-${taskName}>
+                    <span>Confirm Complete:</span>
+                    <span><button id="completeBtn-${taskName}">✓</button></span>
+                    <span><button id="revertBtn-${taskName}">X</button></span>
+                </div>
+            </div>
+            `;
+
+    }
+    function completeTask(taskName) {
+        //reset the time created, original time remaining and the quantity completed to 0, then build the card again with the revertTaskCard Function
+        let taskList = JSON.parse(localStorage.getItem('Task-List'));
+        let task = taskList[taskName];
+        task.lastCompleted = new Date();
+        task.originalTimeRemaining = 
+        // Save the updated task list back to local storage
+        localStorage.setItem('Task-List', JSON.stringify(taskList));
+    }
+    function addOne(taskName) {
+        console.log("yepo");
+        //adds one to the amount completed up to the maximum upon which it will ask if you wish to complete the task with a checkmark &#10003; ✓ or X the X will undo the adding one back to what it was previously
+        let taskList = JSON.parse(localStorage.getItem('Task-List'));
+        let task = taskList[taskName];
+        let quantity = task.quantityCompleted;
+        if (quantity + 1 < task.taskQuantity) {
+            quantity += 1;
+            task.quantityCompleted = quantity;
+            // update the quantity ratio visualization
+            const quantityRatioVisualized = document.querySelector(`#${taskName} .quantityRatioVisualized`);
+            quantityRatioVisualized.textContent = `${quantity}/${task.taskQuantity} ${task.customUnits}`;
+        } else {
+            // make hidden and unhidden the right stuff
+            document.getElementById(`#changingContentCompleteQ-${taskName}`).classList.toggle("hidden");
+        }
+        // Save the updated task list back to local storage
+        localStorage.setItem('Task-List', JSON.stringify(taskList));
+        
+    }
+
     
+    // Populate the tasks according to the Local Storage
     // Populate the tasks according to the Local Storage
     function populateTasksFromLocalStorage() {
         updateTaskList();
@@ -219,52 +275,56 @@
             // Create a new stackable card for the task
             const taskCard = document.createElement("section");
             taskCard.classList.add("stackable-card");
-            let debug = false;
-            if (debug == true) {
-                taskCard.innerHTML = `
-                <section class="task-card" id="${taskList[task].taskName}">
-                    <h2>${taskList[task].taskName}</h2>
-                    <p class="task-item-debug tid-eminanceOfFailure">Eminence of Failure: ${taskList[task].eminanceOfFailure}</p>
-                    <p class="task-item-debug tid-cumulaNum">Cumulative Number: ${taskList[task].cumulaNum}</p>
-                    <p class="task-item-debug tid-numberOfFailures">Number of Failures: ${taskList[task].numberOfFailures}</p>
-                    <p class="task-item-debug tid-taskUnits">Task Units: ${taskList[task].taskUnits}</p>
-                    <p class="task-item-debug tid-taskQuantity">Task Quantity: ${taskList[task].taskQuantity}</p>
-                    <p class="task-item-debug tid-customUnits">Custom Units: ${taskList[task].customUnits}</p>
-                    <p class="task-item-debug tid-taskHourReset">Task Hour Reset: ${taskList[task].taskHourReset}</p>
-                    <p class="task-item-debug tid-taskDayReset">Task Day Reset: ${taskList[task].taskDayReset}</p>
-                    <p class="task-item-debug tid-taskTimeAllowed">Task Time Allowed: ${taskList[task].taskTimeAllowed}</p>
-                    <p class="task-item-debug tid-timeRemaining">Time Remaining: ${taskList[task].timeRemaining}</p>
-                    <p class="task-item-debug tid-timeRemainingVisualized">Time Remaining Visualized: ${taskList[task].timeRemainingVisualized}</p>
-                    <p class="task-item-debug tid-originalTimeRemaining">Original Time Remaining: ${taskList[task].originalTimeRemaining}</p>
-                    <p class="task-item-debug tid-backgroundColor">Background Color: ${taskList[task].backgroundColor}</p>
-                    <p class="task-item-debug tid-lastCompleted">Last Completed: ${taskList[task].lastCompleted}</p>
-                    <p class="task-item-debug tid-desc">Description: ${taskList[task].desc}</p>
-                </section>
-                `;
-            } else {
-                taskCard.innerHTML = `
-                <section class="task-card" id="${taskList[task].taskName}">
-                    <h2>${taskList[task].taskName}</h2>
-                    <details>
+            taskCard.id = `card-${taskList[task].taskName}`;
+            taskCard.innerHTML = `
+                <h2>${taskList[task].taskName}</h2>
+                <div id="changingContentContainer-${taskList[task].taskName}">
+                    <details id="changingContentRegular-${taskList[task].taskName}">
                         <summary>
                             <img height="25x" width="25px">
-                            <button class="task-item upBtn" id="upBtn">&#8593;</button>
-                            <button class="task-item downBtn" id="downBtn">&#8595;</button>
+                            <button class="task-item upBtn" data-taskname="${taskList[task].taskName}">&#8593;</button>
+                            <button class="task-item downBtn" data-taskname="${taskList[task].taskName}">&#8595;</button>
                             <span class="task-item quantityRatioVisualized">${taskList[task].quantityCompleted}/${taskList[task].taskQuantity} ${taskList[task].customUnits}</span>
                             <span class="task-item timeRemainingVisualized">${taskList[task].timeRemainingVisualized}</span>
                         </summary>
                         <p class="task-item desc">${taskList[task].desc}</p>
                     </details>
-                </section>
-                `;
-            }
+                    <div class="hidden" id="changingContentCompleteQ-${taskList[task].taskName}>
+                        <span>Confirm Complete:</span>
+                        <span><button class="completeBtn" id="completeBtn-${taskList[task].taskName}" data-taskname="${taskList[task].taskName}">✓</button></span>
+                        <span><button class="revertBtn" id="revertBtn-${taskList[task].taskName}" data-taskname="${taskList[task].taskName}">X</button></span>
+                    </div>
+                </div>
+            `;
+
             // Add the task card to the task list
             taskListSection.appendChild(taskCard);
 
-            // update background colors
-            document.getElementById(`${taskList[task].taskName}`).style.background = `${taskList[task].backgroundColor}`;
+            // Update background colors
+            document.getElementById(`card-${taskList[task].taskName}`).style.background = `${taskList[task].backgroundColor}`;
         }
+
+        // Add click event listener to the task list section (for event delegation)
+        taskListSection.addEventListener("click", function(event) {
+            // Check if the clicked element is an up or down button
+            if (event.target.classList.contains("upBtn")) {
+                const taskName = event.target.dataset.taskname;
+                addOne(taskName);
+            } else if (event.target.classList.contains("downBtn")) {
+                const taskName = event.target.dataset.taskname;
+                subtractOne(taskName);
+            } else if (event.target.classList.contains("completeBtn")) {
+                const taskName = event.target.dataset.taskname;
+                completeTask(taskName);
+            } else if (event.target.classList.contains("revertBtn")) {
+                const taskName = event.target.dataset.taskname;
+                revertTask(taskName);
+            }
+        });
+
     }
+
+
 
     // Call the populateTasksFromLocalStorage function to initially populate the task list
     populateTasksFromLocalStorage();
@@ -277,3 +337,8 @@
 
 </script>
 </html>
+
+Could you please write a simple paragraph length example of how to use the following program easy enough to understand for a child to read? It needs to be written as an allegory involving a rabbit and a turtle in the voice of huckleberry finn. Try to use between 5 and 8 sentences, no more no less.
+"
+
+"

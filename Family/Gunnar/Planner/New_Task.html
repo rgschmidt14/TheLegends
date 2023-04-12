@@ -9,7 +9,13 @@
     main {
       display: grid;
       grid-template-columns: 1fr 1fr;
-
+    }
+    #go-back-btn {
+      grid-column: 2/3;
+    }
+    form {
+      grid-column: 1/2;
+      grid-row: 1;
     }
     label:not([hidden]){
       display: block;
@@ -35,7 +41,13 @@
       main {
         display: grid;
         grid-template-columns: 1fr;
-      
+      }
+      form {
+        grid-row: 2;
+      }
+      #go-back-btn {
+        grid-column: 1/2;
+        grid-row: 1;
       }
     }
   </style>
