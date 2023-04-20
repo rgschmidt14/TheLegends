@@ -317,7 +317,6 @@
             const taskCard = document.createElement("section");
             taskCard.classList.add("stackable-card");
             taskCard.id = `card-${taskList[task].taskName}`;
-            console.log(`changingContentCompleteQ-${taskList[task].taskName}`);
             taskCard.innerHTML = `
                 <h2>${taskList[task].taskName}</h2>
                 <div id="changingContentContainer-${taskList[task].taskName}">
