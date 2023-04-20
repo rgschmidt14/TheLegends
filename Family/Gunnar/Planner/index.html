@@ -59,6 +59,11 @@
 </body>
 <script src="/Site-Stuff/Scripting/Snippets/template_level_snippets.js"></script>
 <script>
+    if (!localStorage.getItem('Planner-Settings')) {
+        let settings = {}
+        settings.reverseOrder = false;
+        localStorage.setItem('Planner-Settings', JSON.stringify(settings));
+    }
     function formatDuration(seconds) {
         let days = Math.floor(seconds / (3600 * 24));
         let hours = Math.floor((seconds % (3600 * 24)) / 3600);
@@ -104,6 +109,62 @@
         timeRemainingSeconds -= secondsPassed;
 
         return timeRemainingSeconds;
+    }
+    document.getElementById("reOrder").addEventListener("click", () => {reverseOrder();});
+    function reverseOrder() {
+        let settings = JSON.parse(localStorage.getItem('Planner-Settings'));
+        settings.reverseOrder = !settings.reverseOrder;
+        localStorage.setItem('Planner-Settings', JSON.stringify(settings));
+        populateTasksFromLocalStorage();
+    }
+    function reorganizeTasks() {
+        let taskList = JSON.parse(localStorage.getItem('Task-List'));
+        let tasks = Object.values(taskList);
+        tasks.sort(function(a, b) {
+            let aCumulativeFailure = 0;
+            if (a.eminanceOfFailure == "Cumulative") {
+                aCumulativeFailure = a.cumulaNum;
+            } else if (a.eminanceOfFailure == "Nugatory") {
+                // there is no effect from failing and it stays the same
+            } else {
+                // the eminance of failure is immediate
+                aCumulativeFailure = 1;
+            }
+            let bCumulativeFailure = 0;
+            if (b.eminanceOfFailure == "Cumulative") {
+                bCumulativeFailure = b.cumulaNum;
+            } else if (b.eminanceOfFailure == "Nugatory") {
+                // there is no effect from failing and it stays the same
+            } else {
+                // the eminance of failure is immediate
+                bCumulativeFailure = 1;
+            }
+            let aFailRatio = 0;
+            if (aCumulativeFailure > 0) {
+                aFailRatio = a.numberOfFailures / aCumulativeFailure * a.taskDayReset * 24 * 60 * 60;
+            }
+            let bFailRatio = 0;
+            if (bCumulativeFailure > 0) {
+                let bFailRatio = b.numberOfFailures / bCumulativeFailure * b.taskDayReset * 24 * 60 * 60;
+            }
+            let aValue = a.timeRemaining - aFailRatio;
+            let bValue = b.timeRemaining - bFailRatio;
+            console.log(`${a.taskName}:${aValue}\n${b.taskName}:${bValue}`);
+
+            let currentSettings = JSON.parse(localStorage.getItem('Planner-Settings'));
+            let reverseOrder = currentSettings.reverseOrder;
+            console.log(reverseOrder);
+            if (reverseOrder) {
+                return bValue - aValue;
+            } else {
+                return aValue - bValue;
+            }
+        });
+        let newTaskList = {};
+        tasks.forEach(task => {
+            newTaskList[task.taskName] = task;
+        });
+        localStorage.setItem('Task-List', JSON.stringify(newTaskList));
     }
     function updateTaskList() {
         let taskList = JSON.parse(localStorage.getItem('Task-List'));
@@ -206,9 +267,11 @@
             task.numberOfFailures = currentFailures;
 
         }
-
+        
         // Save the updated task list back to local storage
         localStorage.setItem('Task-List', JSON.stringify(taskList));
+        // Reorder the task list before returning it to local storage
+        reorganizeTasks();
     }
 
     function revertTaskCard(taskName) {
@@ -257,12 +320,19 @@
         let differenceInSeconds = ((userDays - 1) * 60 * 24 + (userHours - currentHours) * 60 + (userMinutes - currentMinutes)) * 60;
 
         if (differenceInSeconds <= 0) {
-        differenceInSeconds = ((24*60*60) + differenceInSeconds);
+            differenceInSeconds = ((24*60*60) + differenceInSeconds);
         }
         task.originalTimeRemaining = differenceInSeconds;
+        // Update the visual for these new numbers like in the if on the addOne function below this so that you don't have to refresh the page to see the right number.
+        const quantityRatioVisualized = document.querySelector(`#card-${taskName} .quantityRatioVisualized`);
+        quantityRatioVisualized.textContent = `${task.quantityCompleted}/${task.taskQuantity} ${task.customUnits}`;
         // Save the updated task list back to local storage
         localStorage.setItem('Task-List', JSON.stringify(taskList));
-        // Update the visual for these new numbers like in the if on the addOne function below this so that you don't have to refresh the page to see the right number.
+        
+    }
+    function revertTask(taskName) {
+        // make hidden and unhidden the right stuff
+        document.getElementById(`changingContentCompleteQ-${taskName}`).classList.toggle("hidden");
     }
     function addOne(taskName) {
         console.log("yepo");
@@ -301,9 +371,7 @@
         // Save the updated task list back to local storage
         localStorage.setItem('Task-List', JSON.stringify(taskList));
     }
-
     
-    // Populate the tasks according to the Local Storage
     // Populate the tasks according to the Local Storage
     function populateTasksFromLocalStorage() {
         updateTaskList();
@@ -364,9 +432,6 @@
         });
 
     }
-
-
-
     // Call the populateTasksFromLocalStorage function to initially populate the task list
     populateTasksFromLocalStorage();
 
