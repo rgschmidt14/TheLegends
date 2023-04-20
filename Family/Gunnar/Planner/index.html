@@ -262,7 +262,7 @@
         task.originalTimeRemaining = differenceInSeconds;
         // Save the updated task list back to local storage
         localStorage.setItem('Task-List', JSON.stringify(taskList));
-        // Update the visual for these new numbers like in the if on the addOne function below this
+        // Update the visual for these new numbers like in the if on the addOne function below this so that you don't have to refresh the page to see the right number.
     }
     function addOne(taskName) {
         console.log("yepo");
@@ -369,10 +369,10 @@
 
 
     // Call the populateTasksFromLocalStorage function to initially populate the task list
-    populateTasksFromLocalStorage();
+    // populateTasksFromLocalStorage();
 
     // This is what runs the code, allowing everything to update each set time.
-    // setInterval(() => {populateTasksFromLocalStorage()}, 1000);
+    setInterval(() => {populateTasksFromLocalStorage()}, 1000);
     
     // vvvv for copy and paste testing purposes vvvv
     // console.log("huh");
