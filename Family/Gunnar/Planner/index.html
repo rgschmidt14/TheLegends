@@ -368,10 +368,11 @@
 
 
     // Call the populateTasksFromLocalStorage function to initially populate the task list
-    // populateTasksFromLocalStorage();
+    populateTasksFromLocalStorage();
 
     // This is what runs the code, allowing everything to update each set time.
-    setInterval(() => {populateTasksFromLocalStorage()}, 1000);
+    // this no longer works since I need to have the right stuff hidden, I need an update times option that runs on the second, but it only updates the countdown timers, colors, and order depending on which needs done soonest, any bigger updates will be handled in the appropriate function, also I want the time display to only display the largest two times, aka the first 5 symbols in the string "visualizeTimeRemaining" I believe is what it is called.
+    // setInterval(() => {populateTasksFromLocalStorage()}, 1000);
     
     // vvvv for copy and paste testing purposes vvvv
     // console.log("huh");
