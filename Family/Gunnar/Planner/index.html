@@ -17,7 +17,7 @@
     .stackable-card {
         padding: 0 2vw 1vh 2vw;
         border-bottom: 1px solid rgba(0, 0, 0, 0.24);
-        border-left: 1px solid rgba(0, 0, 0, 0.24);
+        border-left   : 1px solid rgba(0, 0, 0, 0.24);
     }
     .stackable-card h2 {
         margin: 0 1.5vw 1.5vh 2vw;
@@ -241,10 +241,28 @@
         //reset the time created, original time remaining and the quantity completed to 0, then build the card again with the revertTaskCard Function
         let taskList = JSON.parse(localStorage.getItem('Task-List'));
         let task = taskList[taskName];
-        task.lastCompleted = new Date();
-        task.originalTimeRemaining = 
+        now = new Date();
+        task.lastCompleted = now;
+        const currentHours = now.getHours();
+        const currentMinutes = now.getMinutes();
+
+        // Get the user-specified date and time in hours and minutes
+        const userInputTime = task.taskHourReset;
+        const timeParts = userInputTime.split(":");
+        const userDays = task.taskDayReset;
+        const userHours = parseInt(timeParts[0]);
+        const userMinutes = parseInt(timeParts[1]);
+
+        // Calculate the difference in Seconds then converting back to days hours minutes seconds
+        let differenceInSeconds = ((userDays - 1) * 60 * 24 + (userHours - currentHours) * 60 + (userMinutes - currentMinutes)) * 60;
+
+        if (differenceInSeconds <= 0) {
+        differenceInSeconds = ((24*60*60) + differenceInSeconds);
+        }
+        task.originalTimeRemaining = differenceInSeconds;
         // Save the updated task list back to local storage
         localStorage.setItem('Task-List', JSON.stringify(taskList));
+        // Update the visual for these new numbers like in the if on the addOne function below this
     }
     function addOne(taskName) {
         console.log("yepo");
@@ -260,12 +278,28 @@
             quantityRatioVisualized.textContent = `${quantity}/${task.taskQuantity} ${task.customUnits}`;
         } else {
             // make hidden and unhidden the right stuff
-
-            document.querySelector(`#changingContentCompleteQ-${taskName}`).classList.toggle("hidden");
+            document.getElementById(`changingContentCompleteQ-${taskName}`).classList.toggle("hidden");
         }
         // Save the updated task list back to local storage
         localStorage.setItem('Task-List', JSON.stringify(taskList));
         
+    }
+    function subtractOne(taskName) {
+        console.log("yar");
+        let taskList = JSON.parse(localStorage.getItem('Task-List'));
+        let task = taskList[taskName];
+        let quantity = task.quantityCompleted;
+        if (quantity -1 >= 0) {
+            quantity -= 1;
+            task.quantityCompleted = quantity;
+            // update the quantity ratio visualization
+            const quantityRatioVisualized = document.querySelector(`#card-${taskName} .quantityRatioVisualized`);
+            quantityRatioVisualized.textContent = `${quantity}/${task.taskQuantity} ${task.customUnits}`;
+        } else {
+            // make hidden and unhidden the right stuff
+        }
+        // Save the updated task list back to local storage
+        localStorage.setItem('Task-List', JSON.stringify(taskList));
     }
 
     
@@ -283,6 +317,7 @@
             const taskCard = document.createElement("section");
             taskCard.classList.add("stackable-card");
             taskCard.id = `card-${taskList[task].taskName}`;
+            console.log(`changingContentCompleteQ-${taskList[task].taskName}`);
             taskCard.innerHTML = `
                 <h2>${taskList[task].taskName}</h2>
                 <div id="changingContentContainer-${taskList[task].taskName}">
@@ -296,7 +331,7 @@
                         </summary>
                         <p class="task-item desc">${taskList[task].desc}</p>
                     </details>
-                    <div class="hidden" id="changingContentCompleteQ-${taskList[task].taskName}>
+                    <div class="hidden" id="changingContentCompleteQ-${taskList[task].taskName}">
                         <span>Confirm Complete:</span>
                         <span><button class="completeBtn" id="completeBtn-${taskList[task].taskName}" data-taskname="${taskList[task].taskName}">✓</button></span>
                         <span><button class="revertBtn" id="revertBtn-${taskList[task].taskName}" data-taskname="${taskList[task].taskName}">X</button></span>
