@@ -178,6 +178,12 @@
         for (let taskName in taskList) {
             let task = taskList[taskName];
             task.timeRemaining = calculateTimePassed(now, task)
+            if((task.taskTimeAllowed * -1) > task.timeRemaining) {
+                // count a failure
+                completeTask(task.taskName, true);
+                task = taskList[taskName];
+                task.timeRemaining = calculateTimePassed(now, task);
+            }
             let timeRemainingSeconds = task.originalTimeRemaining;
 
             if (task.timeRemaining >= 0) {
@@ -200,10 +206,9 @@
             // changing background color as needed
             let needsChanged = false;
             let currentBackgroundColor = task.backgroundColor;
-            if((task.taskTimeAllowed * -1) > timeRemainingSeconds) {
-                // count a failure
-                completeTask(task.taskName, true);
-            } 
+            console.log(task.taskName, task.taskTimeAllowed * -1, task.timeRemaining)
+            
+
             // else {
             //     //subtract a count from the failure count down to zero as the minimum, no negative numbers
             //     if (currentFailures > 0) {
@@ -213,16 +218,16 @@
             //setting background options in list so they can be accessed by index number later
             let backgroundColors = ["white", "lightgreen", "lightyellow", "lightsalmon", "lightpink", "grey", "black"]
             let correctBackgroundColor = 0;
-            if ((task.taskTimeAllowed * 60 / 2) < timeRemainingSeconds) {
+            if ((task.taskTimeAllowed * 60 / 2) < task.timeRemaining) {
                 //if time remaining until start is greater than half of what is allowed for time to finish, green
                 correctBackgroundColor = 1;
-            } else if ((task.taskTimeAllowed * 60 / 2) >= timeRemainingSeconds && timeRemainingSeconds > 0) {
+            } else if ((task.taskTimeAllowed * 60 / 2) >= task.timeRemaining && task.timeRemaining > 0) {
                 //if time remaining until start is less than or equal to half of the time allowed to finish, but still positive (the time to start the task hasn't happened yet), yellow
                 correctBackgroundColor = 2;
-            } else if (timeRemainingSeconds <= 0 && timeRemainingSeconds >= (task.taskTimeAllowed * -1)) {
+            } else if (task.timeRemaining <= 0 && task.timeRemaining >= (task.taskTimeAllowed * -1)) {
                 //if the time to do the task is now, but the time allowed hasn't been reached yet, salmon (colored)
                 correctBackgroundColor = 3;
-            } else if (timeRemainingSeconds < (task.taskTimeAllowed * -1)) {
+            } else if (task.timeRemaining < (task.taskTimeAllowed * -1)) {
                 //if the time allowed has been surpassed, it is considered a failure now
                 
             } else {
@@ -300,10 +305,11 @@
             console.log("reverted");
 
     }
-    function completeTask(taskName, failed=false) {
+    function completeTask(taskName, failed) {
         //reset the time created, original time remaining and the quantity completed to 0, then build the card again with the revertTaskCard Function
         let taskList = JSON.parse(localStorage.getItem('Task-List'));
         let task = taskList[taskName];
+        console.log(task);
         now = new Date();
         task.lastCompleted = now;
         const currentHours = now.getHours();
@@ -323,19 +329,26 @@
             differenceInSeconds = ((24*60*60) + differenceInSeconds);
         }
         task.originalTimeRemaining = differenceInSeconds;
+        task.timeRemaining = task.originalTimeRemaining;
         // set quantity complete to 0
         task.quantityCompleted = 0;
         // updating the time remaining visualized variable
         task.timeRemainingVisualized = formatDuration(task.originalTimeRemaining);
         // Update the visual for these new numbers like in the if on the addOne function below this so that you don't have to refresh the page to see the right number.
         const quantityRatioVisualized = document.querySelector(`#card-${task.taskNameNoSpaces} .quantityRatioVisualized`);
-        quantityRatioVisualized.textContent = `${task.quantityCompleted}/${task.taskQuantity} ${task.customUnits}`;
+        if (quantityRatioVisualized) {
+            quantityRatioVisualized.textContent = `${task.quantityCompleted}/${task.taskQuantity} ${task.customUnits}`;
+        }
         const timeRemainingVisualized = document.querySelector(`#card-${task.taskNameNoSpaces} .timeRemainingVisualized`);
-        timeRemainingVisualized.textContent = `${task.timeRemainingVisualized}`;
+        if (timeRemainingVisualized) {
+            timeRemainingVisualized.textContent = `${task.timeRemainingVisualized}`;
+        }
         // remove confirm complete option if it is present
         let confirmOption = document.getElementById(`changingContentCompleteQ-${task.taskNameNoSpaces}`);
-        if (!confirmOption.classList.contains("hidden")) {
-            confirmOption.classList.add("hidden");
+        if (confirmOption) {
+            if (!confirmOption.classList.contains("hidden")) {
+                confirmOption.classList.add("hidden");
+            }
         }
         // updating failures
         let maxFailures = 0;
@@ -345,14 +358,15 @@
             maxFailures = 1;
         }
         if (failed) {
+            console.log("grr")
             // add one to failure count if possible
             if (task.numberOfFailures + 1 < maxFailures + 1) {
-                task.numberOfFailures += 1;
+                task.numberOfFailures = Number(task.numberOfFailures) + 1;
             }
         } else {
             // remove one from failure count if possible
             if (task.numberOfFailures - 1 > -1) {
-                task.numberOfFailures -= 1;
+                task.numberOfFailures = Number(task.numberOfFailures) - 1;
             }
             if (task.numberOfFailures < 0) {
                 task.numberOfFailures = 0;
