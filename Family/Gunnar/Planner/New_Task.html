@@ -145,6 +145,7 @@
 
     //////////////Getting values from the form and add them to the new object/////////////////
     newTask.taskName = document.querySelector('#taskName').value;
+    newTask.taskNameNoSpaces = newTask.taskName.replace(/\s/g, '_');
     newTask.eminanceOfFailure = document.querySelector('#eminanceOfFailure').value;
     newTask.cumulaNum = document.querySelector('#cumulaNum').value;
     newTask.taskUnits = document.querySelector('#taskUnits').value;
