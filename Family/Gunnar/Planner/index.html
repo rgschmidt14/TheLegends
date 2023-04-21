@@ -62,6 +62,7 @@
     if (!localStorage.getItem('Planner-Settings')) {
         let settings = {}
         settings.reverseOrder = false;
+        // 0. Default, something went wrong, unchangeable, 1. good standing, 2. do soon, 3. do now, 4. buzzer alarm, 5. louder alarm sinking ship, 6. dead
         settings.backgroundColorsChosen = ["white", "lightgreen", "lightyellow", "lightsalmon", "lightpink", "grey", "black"];
         settings.backgroundColorChoices = ["AliceBlue","AntiqueWhite","Aqua","Aquamarine","Azure","Beige","Bisque","Black","BlanchedAlmond","Blue","BlueViolet","Brown","BurlyWood","CadetBlue","Chartreuse","Chocolate","Coral","CornflowerBlue","Cornsilk","Crimson","Cyan","DarkBlue","DarkCyan","DarkGoldenRod","DarkGray","DarkGrey","DarkGreen","DarkKhaki","DarkMagenta","DarkOliveGreen","DarkOrange","DarkOrchid","DarkRed","DarkSalmon","DarkSeaGreen","DarkSlateBlue","DarkSlateGray","DarkSlateGrey","DarkTurquoise","DarkViolet","DeepPink","DeepSkyBlue","DimGray","DimGrey","DodgerBlue","FireBrick","FloralWhite","ForestGreen","Fuchsia","Gainsboro","GhostWhite","Gold","GoldenRod","Gray","Grey","Green","GreenYellow","HoneyDew","HotPink","IndianRed","Indigo","Ivory","Khaki","Lavender","LavenderBlush","LawnGreen","LemonChiffon","LightBlue","LightCoral","LightCyan","LightGoldenRodYellow","LightGray","LightGrey","LightGreen","LightPink","LightSalmon","LightSeaGreen","LightSkyBlue","LightSlateGray","LightSlateGrey","LightSteelBlue","LightYellow","Lime","LimeGreen","Linen","Magenta","Maroon","MediumAquaMarine","MediumBlue","MediumOrchid","MediumPurple","MediumSeaGreen","MediumSlateBlue","MediumSpringGreen","MediumTurquoise","MediumVioletRed","MidnightBlue","MintCream","MistyRose","Moccasin","NavajoWhite","Navy","OldLace","Olive","OliveDrab","Orange","OrangeRed","Orchid","PaleGoldenRod","PaleGreen","PaleTurquoise","PaleVioletRed","PapayaWhip","PeachPuff","Peru","Pink","Plum","PowderBlue","Purple","Red","RosyBrown","RoyalBlue","SaddleBrown","Salmon","SandyBrown","SeaGreen","SeaShell","Sienna","Silver","SkyBlue","SlateBlue","SlateGray","SlateGrey","Snow","SpringGreen","SteelBlue","Tan","Teal","Thistle","Tomato","Turquoise","Violet","Wheat","White","WhiteSmoke","Yellow","YellowGreen"];
         localStorage.setItem('Planner-Settings', JSON.stringify(settings));
@@ -182,10 +183,11 @@
     // editor handler
 
     //background colors
+    // make boxes appear for them to choose the background color and font color for good, do soon, do now, bad, death
 
 
 
-    
+
 
 
 
@@ -246,19 +248,24 @@
             let correctBackgroundColor = 0;
             if ((task.taskTimeAllowed / 2) < task.timeRemaining) {
                 //if time remaining until start is greater than half of what is allowed for time to finish, green
+                // good
                 correctBackgroundColor = 1;
             } else if ((task.taskTimeAllowed / 2) >= task.timeRemaining && task.timeRemaining > 0) {
                 //if time remaining until start is less than or equal to half of the time allowed to finish, but still positive (the time to start the task hasn't happened yet), yellow
+                // do soon
                 correctBackgroundColor = 2;
             } else if (task.timeRemaining <= 0 && task.timeRemaining >= (task.taskTimeAllowed * -1)) {
                 //if the time to do the task is now, but the time allowed hasn't been reached yet, salmon (colored)
+                // do now
                 correctBackgroundColor = 3;
             } else if (task.timeRemaining < (task.taskTimeAllowed * -1)) {
                 //if the time allowed has been surpassed, it is considered a failure now
-                
+                // this color will only flash for a moment, but is considered the buzzer, an alarm, out of time
+                correctBackgroundColor = 4;
             } else {
                 correctBackgroundColor = 0;
             }
+            // colors 5 and 6 are overdue and death, you should never see death except the solitary second of it resetting upon failure after already being maxed out in failures
             // recoloring based on failures reached
             // if the failures are at half of their max or more mark it one shade darker (closer to red) than it would usually be marked, eg. green goes to yellow, yellow to red, red to black.
             let addinBackgroundNumber = 0;
@@ -288,6 +295,7 @@
             correctBackgroundColor += addinBackgroundNumber;
             if (currentBackgroundColor != backgroundColors[correctBackgroundColor]) {
                 task.backgroundColor = backgroundColors[correctBackgroundColor];
+                //task.textColor = textColors[correctBackgroundColor];
             }
             
 
