@@ -141,15 +141,18 @@
             }
             let aFailRatio = 0;
             if (aCumulativeFailure > 0) {
-                aFailRatio = a.numberOfFailures / aCumulativeFailure * a.taskDayReset * 24 * 60 * 60;
+                aFailRatio = (a.numberOfFailures / aCumulativeFailure) * ((a.taskDayReset *24*60*60) / a.taskTimeAllowed);
             }
             let bFailRatio = 0;
             if (bCumulativeFailure > 0) {
-                let bFailRatio = b.numberOfFailures / bCumulativeFailure * b.taskDayReset * 24 * 60 * 60;
+                bFailRatio = (b.numberOfFailures / bCumulativeFailure) * ((b.taskDayReset *24*60*60) / b.taskTimeAllowed);
             }
-            let aValue = a.timeRemaining - aFailRatio;
-            let bValue = b.timeRemaining - bFailRatio;
-
+            let atimeRemainingRatio = a.timeRemaining / a.taskTimeAllowed;
+            let btimeRemainingRatio = b.timeRemaining / b.taskTimeAllowed;
+            let aValue = atimeRemainingRatio - aFailRatio;
+            let bValue = btimeRemainingRatio - bFailRatio;
+            console.log(a.taskName, aValue, atimeRemainingRatio, aFailRatio);
+            console.log(b.taskName, bValue, btimeRemainingRatio, bFailRatio);
             let currentSettings = JSON.parse(localStorage.getItem('Planner-Settings'));
             let reverseOrder = currentSettings.reverseOrder;
             console.log(reverseOrder);
@@ -185,29 +188,28 @@
                 task.timeRemainingVisualized = "-" + task.timeRemainingVisualized;
             }
             
-            // setting task failed integrated in the background changing controller
-            let currentFailures = task.numberOfFailures;
-            let maxFailures = 0;
-            if (task.eminanceOfFailure == "Cumulative") {
-                maxFailures = task.cumulaNum;
-            } else if (task.eminanceOfFailure == "Immediate") {
-                maxFailures = 1;
-            }
+            // // setting task failed integrated in the background changing controller
+            // let currentFailures = task.numberOfFailures;
+            // let maxFailures = 0;
+            // if (task.eminanceOfFailure == "Cumulative") {
+            //     maxFailures = task.cumulaNum;
+            // } else if (task.eminanceOfFailure == "Immediate") {
+            //     maxFailures = 1;
+            // }
 
             // changing background color as needed
             let needsChanged = false;
             let currentBackgroundColor = task.backgroundColor;
             if((task.taskTimeAllowed * -1) > timeRemainingSeconds) {
-                // add a count to the failure count up to the max number of failures
-                currentFailures += 1;
-                //reset the time created to right now
-                task.lastCompleted = new Date();
-            } else {
-                //subtract a count from the failure count down to zero as the minimum, no negative numbers
-                if (currentFailures > 0) {
-                    currentFailures -= 1;
-                }
-            }
+                // count a failure
+                completeTask(task.taskName, true);
+            } 
+            // else {
+            //     //subtract a count from the failure count down to zero as the minimum, no negative numbers
+            //     if (currentFailures > 0) {
+            //         currentFailures -= 1;
+            //     }
+            // }
             //setting background options in list so they can be accessed by index number later
             let backgroundColors = ["white", "lightgreen", "lightyellow", "lightsalmon", "lightpink", "grey", "black"]
             let correctBackgroundColor = 0;
@@ -258,11 +260,11 @@
             }
             
 
-            // setting the new number of failures and saving to the task object
-            if (currentFailures > maxFailures) {
-                currentFailures = maxFailures;
-            }
-            task.numberOfFailures = currentFailures;
+            // // setting the new number of failures and saving to the task object
+            // if (currentFailures > maxFailures) {
+            //     currentFailures = maxFailures;
+            // }
+            // task.numberOfFailures = currentFailures;
 
         }
         
@@ -298,7 +300,7 @@
             console.log("reverted");
 
     }
-    function completeTask(taskName) {
+    function completeTask(taskName, failed=false) {
         //reset the time created, original time remaining and the quantity completed to 0, then build the card again with the revertTaskCard Function
         let taskList = JSON.parse(localStorage.getItem('Task-List'));
         let task = taskList[taskName];
@@ -330,8 +332,33 @@
         quantityRatioVisualized.textContent = `${task.quantityCompleted}/${task.taskQuantity} ${task.customUnits}`;
         const timeRemainingVisualized = document.querySelector(`#card-${task.taskNameNoSpaces} .timeRemainingVisualized`);
         timeRemainingVisualized.textContent = `${task.timeRemainingVisualized}`;
-        // remove confirm complete option
-        document.getElementById(`changingContentCompleteQ-${task.taskNameNoSpaces}`).classList.toggle("hidden");
+        // remove confirm complete option if it is present
+        let confirmOption = document.getElementById(`changingContentCompleteQ-${task.taskNameNoSpaces}`);
+        if (!confirmOption.classList.contains("hidden")) {
+            confirmOption.classList.add("hidden");
+        }
+        // updating failures
+        let maxFailures = 0;
+        if (task.eminanceOfFailure == "Cumulative") {
+            maxFailures = task.cumulaNum;
+        } else if (task.eminanceOfFailure == "Immediate") {
+            maxFailures = 1;
+        }
+        if (failed) {
+            // add one to failure count if possible
+            if (task.numberOfFailures + 1 < maxFailures + 1) {
+                task.numberOfFailures += 1;
+            }
+        } else {
+            // remove one from failure count if possible
+            if (task.numberOfFailures - 1 > -1) {
+                task.numberOfFailures -= 1;
+            }
+            if (task.numberOfFailures < 0) {
+                task.numberOfFailures = 0;
+            }
+        }
+        
         // Save the updated task list back to local storage
         localStorage.setItem('Task-List', JSON.stringify(taskList));
         
@@ -343,7 +370,6 @@
         document.getElementById(`changingContentCompleteQ-${task.taskNameNoSpaces}`).classList.toggle("hidden");
     }
     function addOne(taskName) {
-        console.log("yepo");
         //adds one to the amount completed up to the maximum upon which it will ask if you wish to complete the task with a checkmark &#10003; ✓ or X the X will undo the adding one back to what it was previously
         let taskList = JSON.parse(localStorage.getItem('Task-List'));
         let task = taskList[taskName];
@@ -356,14 +382,16 @@
             quantityRatioVisualized.textContent = `${quantity}/${task.taskQuantity} ${task.customUnits}`;
         } else {
             // make hidden and unhidden the right stuff
-            document.getElementById(`changingContentCompleteQ-${task.taskNameNoSpaces}`).classList.toggle("hidden");
+            let confirmOption = document.getElementById(`changingContentCompleteQ-${task.taskNameNoSpaces}`);
+            if (confirmOption.classList.contains("hidden")) {
+                confirmOption.classList.remove("hidden");
+            }
         }
         // Save the updated task list back to local storage
         localStorage.setItem('Task-List', JSON.stringify(taskList));
         
     }
     function subtractOne(taskName) {
-        console.log("yar");
         let taskList = JSON.parse(localStorage.getItem('Task-List'));
         let task = taskList[taskName];
         let quantity = task.quantityCompleted;
@@ -373,8 +401,11 @@
             // update the quantity ratio visualization
             const quantityRatioVisualized = document.querySelector(`#card-${task.taskNameNoSpaces} .quantityRatioVisualized`);
             quantityRatioVisualized.textContent = `${quantity}/${task.taskQuantity} ${task.customUnits}`;
-        } else {
-            // make hidden and unhidden the right stuff
+        }
+        // remove confirm complete option if it is present
+        let confirmOption = document.getElementById(`changingContentCompleteQ-${task.taskNameNoSpaces}`);
+        if (!confirmOption.classList.contains("hidden")) {
+            confirmOption.classList.add("hidden");
         }
         // Save the updated task list back to local storage
         localStorage.setItem('Task-List', JSON.stringify(taskList));

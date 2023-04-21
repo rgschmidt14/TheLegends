@@ -154,7 +154,7 @@
     newTask.customUnits = document.querySelector('#customUnits').value;
     newTask.taskHourReset = document.querySelector('#taskHourReset').value;
     newTask.taskDayReset = document.querySelector('#taskDayReset').value;
-    newTask.taskTimeAllowed = document.querySelector('#taskTimeAllowed').value;
+    newTask.taskTimeAllowed = (Number(document.querySelector('#taskTimeAllowed').value) * 60);
     newTask.desc = document.querySelector('#desc').value;
     newTask.numberOfFailures = document.querySelector('#failures').value;
     newTask.lastCompleted = new Date;
