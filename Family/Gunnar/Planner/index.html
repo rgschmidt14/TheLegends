@@ -209,6 +209,7 @@
             if((task.taskTimeAllowed * -1) > task.timeRemaining) {
                 // count a failure
                 completeTask(task.taskName, true);
+                taskList = JSON.parse(localStorage.getItem('Task-List'));
                 task = taskList[taskName];
                 task.timeRemaining = calculateTimePassed(now, task);
             }
@@ -356,10 +357,15 @@
         const userHours = parseInt(timeParts[0]);
         const userMinutes = parseInt(timeParts[1]);
 
+        // Get the seconds remaining in the current day for use later
+        const secondsInDay = 24 * 60 * 60;
+        const secondsPassedToday = currentHours * 60 * 60 + currentMinutes * 60;
+        let secondsRemainingInDay = secondsInDay - secondsPassedToday;
         // Calculate the difference in Seconds then converting back to days hours minutes seconds
         let differenceInSeconds = ((userDays - 1) * 60 * 24 + (userHours - currentHours) * 60 + (userMinutes - currentMinutes)) * 60;
+        
 
-        if (differenceInSeconds <= 0) {
+        if (differenceInSeconds <= 0 || differenceInSeconds <= secondsRemainingInDay) {
             differenceInSeconds = ((24*60*60) + differenceInSeconds);
         }
         task.originalTimeRemaining = differenceInSeconds;
@@ -409,7 +415,7 @@
         
         // Save the updated task list back to local storage
         localStorage.setItem('Task-List', JSON.stringify(taskList));
-        
+        updateTaskList();
     }
     function revertTask(taskName) {
         let taskList = JSON.parse(localStorage.getItem('Task-List'));
