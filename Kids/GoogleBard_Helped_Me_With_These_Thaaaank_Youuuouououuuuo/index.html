@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Things List</title>
+</head>
+<body>
+  <h1>Things List</h1>
+  <form action="javascript:void(0);" method="post">
+    <input type="text" name="name" placeholder="Name of Thing">
+    <input type="text" name="description" placeholder="Flavor Text/Description">
+    <input type="text" name="qualities" placeholder="Qualities/Characteristics/Attributes">
+    <input type="submit" value="Add">
+  </form>
+  <ul id="things-list"></ul>
+  <script>
+    let thingsList = {};
+    let isNewThing = true;
+    let thingName;
+    let thingDescription;
+    let thingQualities;
+
+    function addThing() {
+      thingName = document.querySelector("input[name=name]").value;
+      thingDescription = document.querySelector("input[name=description]").value;
+      thingQualities = document.querySelector("input[name=qualities]").value;
+
+      if (thingsList[thingName]) {
+        isNewThing = false;
+        alert("A thing with that name already exists. Would you like to overwrite it?");
+      } else {
+        thingsList[thingName] = [thingDescription, thingQualities];
+        isNewThing = true;
+      }
+
+      if (isNewThing) {
+        saveThingsList();
+        displayThingsList();
+      }
+    }
+
+    function saveThingsList() {
+      window.localStorage.setItem("Things-List", JSON.stringify(thingsList));
+    }
+
+    function displayThingsList() {
+      let thingsListUl = document.getElementById("things-list");
+      thingsListUl.innerHTML = "";
+
+      for (let thingName in thingsList) {
+        let thing = thingsList[thingName];
+        let thingLi = document.createElement("li");
+        thingLi.textContent = thingName;
+        thingLi.addEventListener("click", function() {
+          showThingDetails(thingName);
+        });
+        thingsListUl.appendChild(thingLi);
+      }
+    }
+
+    function showThingDetails(thingName) {
+      let thingDetailsDiv = document.getElementById("thing-details");
+      thingDetailsDiv.innerHTML = "";
+
+      let thing = thingsList[thingName];
+      let thingDetailsP = document.createElement("p");
+      thingDetailsP.textContent = thing[0];
+      thingDetailsDiv.appendChild(thingDetailsP);
+
+      let thingQualitiesUl = document.createElement("ul");
+      for (let quality of thing[1]) {
+        let thingQualityLi = document.createElement("li");
+        thingQualityLi.textContent = quality;
+        thingQualitiesUl.appendChild(thingQualityLi);
+      }
+      thingDetailsDiv.appendChild(thingQualitiesUl);
+    }
+
+    addThing();
+    displayThingsList();
+  </script>
+</body>
+</html>
