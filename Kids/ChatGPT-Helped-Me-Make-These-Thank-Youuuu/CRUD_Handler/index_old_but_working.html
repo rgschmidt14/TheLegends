@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CRUD Example with Vue.js - Project Manager</title>
+  <style>
+    /* CSS styles */
+    body {
+      font-family: Arial, sans-serif;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    h1 {
+      text-align: center;
+    }
+    
+    form {
+      margin-bottom: 20px;
+    }
+    
+    form input[type="text"],
+    form textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    table th,
+    table td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    table th {
+      background-color: #f2f2f2;
+    }
+    
+    .actions {
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .actions button {
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    
+    .actions button:hover {
+      background-color: #f2f2f2;
+    }
+
+    .column-names {
+      margin-top: 40px;
+    }
+
+    .column-names input[type="text"],
+    .column-names select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .column-names button {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="container">
+    <h1>CRUD Example with Vue.js - Project Manager</h1>
+
+    <div v-if="!currentProject">
+      <h2>Create New Project</h2>
+      <input type="text" v-model="newProjectTitle" placeholder="Enter Project Name" required>
+      <button @click="createNewProject">Create Project</button>
+    </div>
+
+    <div v-else>
+      <h2>Project: {{ currentProject.title }}</h2>
+
+      <form @submit.prevent="addItem">
+        <div v-for="(column, colIndex) in currentProject.columns" :key="colIndex">
+          <template v-if="column.type === 'Name'">
+            <input type="text" v-model="newItem[column.name]" :placeholder="column.name" required>
+          </template>
+          <template v-else-if="column.type === 'Description'">
+            <textarea v-model="newItem[column.name]" :placeholder="column.name"></textarea>
+          </template>
+          <template v-else-if="column.type === 'Number'">
+            <input type="number" v-model="newItem[column.name]" :placeholder="column.name" required>
+          </template>
+          <template v-else-if="column.type === 'List'">
+            <div v-for="(value, index) in newItem[column.name]" :key="index">
+              <input type="text" v-model="newItem[column.name][index]" :placeholder="`${column.name} ${index + 1}`" required>
+            </div>
+            <button @click="addListValue(column.name)">Add Value</button>
+          </template>
+          <template v-else-if="column.type === 'Dice_Count'">
+            <input type="text" v-model="newItem[column.name]" :placeholder="column.name" required>
+          </template>
+        </div>
+        <button>Add Item</button>
+      </form>
+
+      <table v-if="currentProject.data.length > 0">
+        <thead>
+          <tr>
+            <th v-for="(column, colIndex) in currentProject.columns" :key="colIndex">{{ column.name }}</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in currentProject.data" :key="index">
+            <td v-for="(column, colIndex) in currentProject.columns" :key="colIndex">
+              {{ item[column.name] }}
+            </td>
+            <td>
+              <button @click="editItem(index)">Edit</button>
+              <button @click="deleteItem(index)">Delete</button>
+              <button @click="duplicateItem(index)">Duplicate</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div v-else>
+        <p>No data available</p>
+      </div>
+
+      <div class="column-names">
+        <h2>Column Names</h2>
+        <div v-for="(column, colIndex) in currentProject.columns" :key="colIndex">
+          <input type="text" v-model="column.name" :placeholder="`Column ${colIndex + 1}`" required>
+          <select v-model="column.type">
+            <option value="Name">Name</option>
+            <option value="Description">Description</option>
+            <option value="Number">Number</option>
+            <option value="List">List</option>
+            <option value="Dice_Count">Dice_Count</option>
+          </select>
+          <button @click="removeColumn(colIndex)">Remove</button>
+        </div>
+        <button @click="addColumn">Add Column</button>
+      </div>
+
+      <div class="actions">
+        <button @click="saveCurrentProject">Save Current Project</button>
+        <button @click="loadPreviousProject">Load Previous Project</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        projects: [],
+        currentProject: null,
+        newProjectTitle: '',
+        newItem: {},
+      },
+      mounted() {
+        this.loadProjects();
+      },
+      watch: {
+        projects: {
+          handler() {
+            this.saveProjects();
+          },
+          deep: true,
+        },
+        currentProject: {
+          handler() {
+            this.saveCurrentProject();
+          },
+          deep: true,
+        },
+      },
+      methods: {
+        createNewProject() {
+          const project = {
+            title: this.newProjectTitle,
+            columns: [
+              { name: 'Name', type: 'Name' },
+              { name: 'Description', type: 'Description' },
+              { name: 'Number', type: 'Number' },
+            ],
+            data: [],
+          };
+          this.projects.push(project);
+          this.currentProject = project;
+          this.newProjectTitle = '';
+        },
+        addItem() {
+          for (const column of this.currentProject.columns) {
+            if (column.type === 'Number') {
+              const value = this.newItem[column.name];
+              if (isNaN(value)) {
+                alert(`${column.name} must be a valid number.`);
+                return;
+              }
+            } else if (column.type === 'Dice_Count') {
+              const value = this.newItem[column.name];
+              const regex = /^\d+$/;
+              if (!regex.test(value)) {
+                if (!value.includes('d')) {
+                  alert(`${column.name} must be a valid dice count.`);
+                  return;
+                }
+                this.newItem[column.name] = value;
+              } else {
+                this.newItem[column.name] = `1d${value}`;
+              }
+            }
+          }
+
+          this.currentProject.data.push({ ...this.newItem });
+          this.newItem = this.createEmptyItem();
+        },
+        editItem(index) {
+          const item = this.currentProject.data[index];
+          this.newItem = { ...item };
+          this.currentProject.data.splice(index, 1);
+        },
+        deleteItem(index) {
+          this.currentProject.data.splice(index, 1);
+        },
+        duplicateItem(index) {
+          const item = this.currentProject.data[index];
+          this.currentProject.data.splice(index + 1, 0, { ...item });
+        },
+        addListValue(columnName) {
+          for (const column of this.currentProject.columns) {
+            if (column.name === columnName) {
+              this.newItem[column.name].push('');
+              break;
+            }
+          }
+        },
+        removeColumn(index) {
+          this.currentProject.columns.splice(index, 1);
+          for (const item of this.currentProject.data) {
+            for (const column of this.currentProject.columns) {
+              if (!item.hasOwnProperty(column.name)) {
+                continue;
+              }
+              if (column.type === 'List') {
+                item[column.name].splice(index, 1);
+              } else {
+                delete item[column.name];
+              }
+            }
+          }
+        },
+        addColumn() {
+          this.currentProject.columns.push({
+            name: `Column ${this.currentProject.columns.length + 1}`,
+            type: 'Name',
+          });
+        },
+        createEmptyItem() {
+          const item = {};
+          for (const column of this.currentProject.columns) {
+            if (column.type === 'List') {
+              item[column.name] = [''];
+            } else {
+              item[column.name] = '';
+            }
+          }
+          return item;
+        },
+        saveProjects() {
+          localStorage.setItem('crudProjects', JSON.stringify(this.projects));
+        },
+        loadProjects() {
+          const projects = localStorage.getItem('crudProjects');
+          this.projects = projects ? JSON.parse(projects) : [];
+          if (this.projects.length > 0) {
+            this.currentProject = this.projects[0];
+          }
+        },
+        saveCurrentProject() {
+          localStorage.setItem('currentProject', JSON.stringify(this.currentProject));
+        },
+        loadPreviousProject() {
+          const previousProject = localStorage.getItem('currentProject');
+          if (previousProject) {
+            this.currentProject = JSON.parse(previousProject);
+          } else {
+            alert('No previous project found.');
+          }
+        },
+      },
+    });
+  </script>
+</body>
+</html>
