@@ -53,7 +53,34 @@
         <input type="number" id="maxVal">
         <button class="button" id="rollAbilitiesBtn">Roll Abilities</button>
         
-        <p id="resultDisplay"></p>
+        <form id="displayOptions">
+          <legend>Display Results:</legend>
+          <label>
+            <input type="checkbox" name="displayOption" value="total" checked> Total
+          </label>
+          <label>
+            <input type="checkbox" name="displayOption" value="high" checked> High
+          </label>
+          <label>
+            <input type="checkbox" name="displayOption" value="low" checked> Low
+          </label>
+          <label>
+            <input type="checkbox" name="displayOption" value="mostCommon"> Most Common
+          </label>
+          <label>
+            <input type="checkbox" name="displayOption" value="leastCommon"> Least Common
+          </label>
+          <label>
+            <input type="checkbox" name="displayOption" value="array"> Array/List
+          </label>
+        </form>
+        
+        <span id="totalResult"></span>
+        <span id="highResult"></span>
+        <span id="lowResult"></span>
+        <span id="mostCommonResult"></span>
+        <span id="leastCommonResult"></span>
+        <span id="arrayResult"></span>
       
     </main>
     <footer id="main-footer">
@@ -68,18 +95,79 @@
       const userInput = document.getElementById('userInput').value;
       // Split the input to get the number of dice and the number of sides
       const [numDice, numSides] = userInput.split('d');
-      // Roll the dice and get the total
+      // Roll the dice and get the individual rolls and total
+      let rolls = [];
       let total = 0;
       for (let i = 0; i < numDice; i++) {
-        total += Math.floor(Math.random() * numSides) + 1;
+        const roll = Math.floor(Math.random() * numSides) + 1;
+        rolls.push(roll);
+        total += roll;
       }
       // Display the result to the user
-      const resultDisplay = document.getElementById('resultDisplay');
-      resultDisplay.textContent = `You rolled a total of ${total}.`;
+      const displayOptions = document.getElementsByName('displayOption');
+      for (const option of displayOptions) {
+        const spanId = option.value + 'Result';
+        const resultSpan = document.getElementById(spanId);
+        if (option.checked) {
+          switch (option.value) {
+            case 'total':
+              resultSpan.textContent = `Total: ${total}`;
+              break;
+            case 'high':
+              resultSpan.textContent = `High: ${Math.max(...rolls)}`;
+              break;
+            case 'low':
+              resultSpan.textContent = `Low: ${Math.min(...rolls)}`;
+              break;
+            case 'mostCommon':
+              resultSpan.textContent = `Most Common: ${getMode(rolls)}`;
+              break;
+            case 'leastCommon':
+              resultSpan.textContent = `Least Common: ${getLeastCommon(rolls)}`;
+              break;
+            case 'array':
+              resultSpan.textContent = `Array/List: [${rolls.join(', ')}]`;
+              break;
+          }
+        } else {
+          resultSpan.textContent = '';
+        }
+      }
+    }
+
+    // Function to get the mode (most common elements) in an array
+    function getMode(arr) {
+      const counts = {};
+      for (const num of arr) {
+        counts[num] = (counts[num] || 0) + 1;
+      }
+      const maxCount = Math.max(...Object.values(counts));
+      const modes = [];
+      for (const [num, count] of Object.entries(counts)) {
+        if (count === maxCount) {
+          modes.push(num);
+        }
+      }
+      return modes.join(', ');
+    }
+
+    // Function to get the least common elements in an array
+    function getLeastCommon(arr) {
+      const counts = {};
+      for (const num of arr) {
+        counts[num] = (counts[num] || 0) + 1;
+      }
+      const leastCommon = [];
+      const minCount = Math.min(...Object.values(counts));
+      for (const [num, count] of Object.entries(counts)) {
+        if (count === minCount) {
+          leastCommon.push(num);
+        }
+      }
+      return leastCommon.join(', ');
     }
     
     // Function to roll abilities
-
     function rollAbilities() {
         const minVal = Number(document.getElementById('minVal').value);
         const maxVal = Number(document.getElementById('maxVal').value);
@@ -89,44 +177,19 @@
         while (abilities.length < 6 || abilities.reduce((acc, val) => acc + val) < minVal || abilities.reduce((acc, val) => acc + val) > maxVal) {
             tries++;
             abilities = [];
-            for (let i = 0; i < 6; i++) {
             let rolls = [];
-            for (let j = 0; j < 4; j++) {
-                rolls.push(Math.floor(Math.random() * 6) + 1);
-            }
-            rolls.sort((a, b) => b - a);
-            abilities.push(rolls[0] + rolls[1] + rolls[2]);
+            for (let i = 0; i < 6; i++) {
+              rolls = [];
+              for (let j = 0; j < 4; j++) {
+                  rolls.push(Math.floor(Math.random() * 6) + 1);
+              }
+              rolls.sort((a, b) => b - a);
+              abilities.push(rolls[0] + rolls[1] + rolls[2]);
             }
             abilities.sort((a, b) => b - a);
         }
-        resultDisplay.textContent = `You rolled abilities: ${abilities.join(', ')}. It took ${tries} tries ${String.fromCodePoint(0x1F603)}`;
+        resultDisplay.textContent = `Total: ${abilities.reduce((acc, val) => acc + val)} High: ${Math.max(...abilities)} Low: ${Math.min(...abilities)} Most Common: ${getMode(abilities)} Least Common: ${getLeastCommon(abilities)} [${abilities.join(', ')}] It took ${tries} tries ${String.fromCodePoint(0x1F603)}`;
     }
-
-
-
-    // function rollAbilities() {
-    // const minVal = Number(document.getElementById('minVal').value);
-    // const maxVal = Number(document.getElementById('maxVal').value);
-    // const resultDisplay = document.getElementById('resultDisplay');
-    // let abilities = [];
-    // for (let i = 0; i < 6; i++) {
-    //     let rolls = [];
-    //     for (let j = 0; j < 4; j++) {
-    //     rolls.push(Math.floor(Math.random() * 6) + 1);
-    //     }
-    //     rolls.sort((a, b) => b - a);
-    //     let total = rolls[0] + rolls[1] + rolls[2];
-    //     abilities.push(total);
-    // }
-    // abilities.sort((a, b) => b - a);
-    // let sum = abilities.reduce((a, b) => a + b);
-    // if (sum < minVal * 6 || sum > maxVal * 6) {
-    //     resultDisplay.textContent = `Sorry, your total ability score is not within the range of ${minVal * 6} to ${maxVal * 6}. Please try again.`;
-    //     return;
-    // }
-    // let listItems = abilities.map(ability => `<li>${ability}</li>`).join('');
-    // resultDisplay.innerHTML = `<p>You rolled abilities:</p><ul>${listItems}</ul>`;
-    // }
     
     // Add event listeners to the buttons
     document.getElementById('rollDiceBtn').addEventListener('click', rollDice);

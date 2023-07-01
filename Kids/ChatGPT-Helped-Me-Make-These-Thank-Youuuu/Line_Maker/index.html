@@ -5,17 +5,36 @@
     body {
       font-family: Arial, sans-serif;
       text-align: center;
+      background-color: #f0f8ff; /* Light green pattern background */
+      margin: 0;
+      padding: 0;
     }
 
-    #line {
+    #graph-container {
+      width: 100%;
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: white;
       position: relative;
+    }
+
+    #graph {
       width: 100%;
       height: 400px;
-      border-bottom: 2px solid black;
-      margin-top: 100px;
+      position: relative;
+      border: 1px solid #ccc;
+      overflow: hidden; /* Prevent graph overflow */
+      box-sizing: border-box; /* Include border in width and height calculations */
     }
 
-    .point {
+    .grid-line {
+      position: absolute;
+      background-color: rgba(128, 128, 128, 0.5);
+      pointer-events: none; /* Disable pointer events on grid lines */
+    }
+
+    .dot {
       position: absolute;
       width: 10px;
       height: 10px;
@@ -23,64 +42,154 @@
       background-color: blue;
       cursor: pointer;
     }
+
+    #line {
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      background-color: blue;
+      top: 50%;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
-  <div id="line">
-    <div id="point-negative-one" class="point"></div>
-    <div id="point-one" class="point"></div>
-    <div id="drag-point" class="point"></div>
+  <div id="graph-container">
+    <div id="graph">
+      <!-- Grid lines will be dynamically generated here -->
+      <div id="grid-line" class="grid-line"></div>
+      <div id="line"></div>
+      <!-- Dots will be dynamically generated here -->
+    </div>
+
+    <div>
+      <label for="positive-checkbox">
+        <input type="checkbox" id="positive-checkbox">
+        Add Positive Endpoint
+      </label>
+      <label for="negative-checkbox">
+        <input type="checkbox" id="negative-checkbox">
+        Add Negative Endpoint
+      </label>
+      <button id="add-dot-button">Add Dot</button>
+    </div>
+
+    <div>
+      <label for="horizontal-scale">Horizontal Scale: </label>
+      <input type="number" id="horizontal-scale" min="1" step="1" value="100">
+      <label for="vertical-scale">Vertical Scale: </label>
+      <input type="number" id="vertical-scale" min="1" step="1" value="100">
+    </div>
+
+    <div id="equation">
+      <!-- Line equation representation will be dynamically generated here -->
+    </div>
   </div>
 
   <script>
-    // Function to update the position of the drag point
-    function updateDragPointPosition() {
-      const line = document.getElementById('line');
-      const dragPoint = document.getElementById('drag-point');
-      const rect = line.getBoundingClientRect();
-      const x = rect.width / 2; // The x position of the drag point is always at the center of the line
-      const y = dragPoint.offsetTop - rect.top; // The y position of the drag point relative to the line
+    // Variables for graph and dot elements
+    const graph = document.getElementById('graph');
+    const dots = [];
 
-      // Limit the y position of the drag point within the range [-1, 1]
-      const yClamped = Math.min(Math.max(y / rect.height * 2 - 1, -1), 1);
-
-      // Update the drag point's position
-      dragPoint.style.transform = `translate(${x}px, ${(yClamped * rect.height) / 2}px)`;
+    // Function to create a dot element
+    function createDot(x, y) {
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      dot.style.left = `${x}px`;
+      dot.style.top = `${y}px`;
+      graph.appendChild(dot);
+      return dot;
     }
 
-    // Function to handle dragging of the point
+    // Function to update the line based on dot positions
+    function updateLine() {
+      const line = document.getElementById('line');
+      const dotPositions = dots.map((dot) => ({
+        x: parseFloat(dot.style.left),
+        y: parseFloat(dot.style.top),
+      }));
+
+      // Implement the line calculation here based on dotPositions
+
+      // Set the line position and rotation
+      line.style.top = `${dotPositions[0].y}px`;
+      line.style.transform = `rotate(${angle}rad)`;
+    }
+
+    // Event listener for dot drag functionality
     function drag(event) {
-      const line = document.getElementById('line');
-      const dragPoint = document.getElementById('drag-point');
-      const rect = line.getBoundingClientRect();
-      const minY = -rect.height / 2;
-      const maxY = rect.height / 2;
-      const newY = event.clientY - rect.top;
+      const dot = event.target;
+      const dotIndex = dots.indexOf(dot);
+      const initialX = parseFloat(dot.style.left);
+      const initialY = parseFloat(dot.style.top);
+      const initialMouseX = event.clientX;
+      const initialMouseY = event.clientY;
 
-      // Limit the new y position within the range [-1, 1]
-      const clampedY = Math.min(Math.max(newY, minY), maxY);
+      function move(event) {
+        const mouseX = event.clientX;
+        const mouseY = event.clientY;
+        const diffX = mouseX - initialMouseX;
+        const diffY = mouseY - initialMouseY;
+        const newX = initialX + diffX;
+        const newY = initialY + diffY;
+        dot.style.left = `${newX}px`;
+        dot.style.top = `${newY}px`;
+        updateLine();
+      }
 
-      // Update the drag point's position
-      dragPoint.style.transform = `translate(${dragPoint.offsetLeft}px, ${clampedY}px)`;
+      function stop() {
+        document.removeEventListener('mousemove', move);
+        document.removeEventListener('mouseup', stop);
+      }
+
+      document.addEventListener('mousemove', move);
+      document.addEventListener('mouseup', stop);
     }
 
-    // Event listeners for mouse events
-    document.addEventListener('mousedown', function (event) {
-      if (event.target.classList.contains('point')) {
-        // Add the drag event listener when mouse button is pressed down on a point
-        document.addEventListener('mousemove', drag);
+    // Event listener for adding a new dot
+    function addDot() {
+      const addPositive = document.getElementById('positive-checkbox').checked;
+      const addNegative = document.getElementById('negative-checkbox').checked;
+
+      if (!addPositive && !addNegative) {
+        return;
       }
-    });
 
-    document.addEventListener('mouseup', function () {
-      // Remove the drag event listener when mouse button is released
-      document.removeEventListener('mousemove', drag);
-      // Update the position of the drag point after dragging
-      updateDragPointPosition();
-    });
+      const graphRect = graph.getBoundingClientRect();
+      const graphLeft = graphRect.left;
+      const graphTop = graphRect.top;
 
-    // Initialize the drag point's position
-    updateDragPointPosition();
+      if (addPositive) {
+        const positiveDot = createDot(graphLeft + graphRect.width, graphTop);
+        positiveDot.addEventListener('mousedown', drag);
+        dots.push(positiveDot);
+      }
+
+      if (addNegative) {
+        const negativeDot = createDot(graphLeft, graphTop);
+        negativeDot.addEventListener('mousedown', drag);
+        dots.push(negativeDot);
+      }
+
+      updateLine();
+    }
+
+    // Event listener for horizontal and vertical scale inputs
+    function updateScales() {
+      const horizontalScale = document.getElementById('horizontal-scale').value;
+      const verticalScale = document.getElementById('vertical-scale').value;
+
+      // Implement scaling logic here
+
+      updateLine();
+    }
+
+    // Add event listeners to elements
+    const addDotButton = document.getElementById('add-dot-button');
+    addDotButton.addEventListener('click', addDot);
+
+    const scaleInputs = document.querySelectorAll('#horizontal-scale, #vertical-scale');
+    scaleInputs.forEach((input) => input.addEventListener('input', updateScales));
   </script>
 </body>
 </html>
