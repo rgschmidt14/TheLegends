@@ -64,37 +64,42 @@
 
         <p>
           <label class="checkbox-label">
-            <input type="checkbox" id="totalCheckbox" checked>
-            Total
-          </label>
-          <label class="checkbox-label">
             <input type="checkbox" id="highCheckbox" checked>
             High
           </label>
           <label class="checkbox-label">
-            <input type="checkbox" id="lowCheckbox" checked>
+            <input type="checkbox" id="lowCheckbox">
             Low
           </label>
           <label class="checkbox-label">
-            <input type="checkbox" id="mostCommonCheckbox" checked>
-            Most Common
+            <input type="checkbox" id="averageCheckbox">
+            Average
           </label>
           <label class="checkbox-label">
-            <input type="checkbox" id="leastCommonCheckbox" checked>
+            <input type="checkbox" id="totalCheckbox">
+            Total
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="leastCommonCheckbox">
             Least Common
           </label>
           <label class="checkbox-label">
-            <input type="checkbox" id="listCheckbox" checked>
+            <input type="checkbox" id="mostCommonCheckbox">
+            Most Common
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="listCheckbox">
             List
           </label>
         </p>
         
         <div id="resultContainer">
-          <div id="totalResult" class="result-section"></div>
           <div id="highResult" class="result-section"></div>
           <div id="lowResult" class="result-section"></div>
-          <div id="mostCommonResult" class="result-section"></div>
+          <div id="averageResult" class="result-section"></div>
+          <div id="totalResult" class="result-section"></div>
           <div id="leastCommonResult" class="result-section"></div>
+          <div id="mostCommonResult" class="result-section"></div>
           <div id="listResult" class="result-section"></div>
         </div>
         <p id="resultDisplay"></p>
@@ -136,6 +141,7 @@
       const totalCheckbox = document.getElementById('totalCheckbox');
       const highCheckbox = document.getElementById('highCheckbox');
       const lowCheckbox = document.getElementById('lowCheckbox');
+      const averageCheckbox = document.getElementById('averageCheckbox');
       const mostCommonCheckbox = document.getElementById('mostCommonCheckbox');
       const leastCommonCheckbox = document.getElementById('leastCommonCheckbox');
       const listCheckbox = document.getElementById('listCheckbox');
@@ -143,6 +149,7 @@
       const totalResult = document.getElementById('totalResult');
       const highResult = document.getElementById('highResult');
       const lowResult = document.getElementById('lowResult');
+      const averageResult = document.getElementById('averageResult');
       const mostCommonResult = document.getElementById('mostCommonResult');
       const leastCommonResult = document.getElementById('leastCommonResult');
       const listResult = document.getElementById('listResult');
@@ -150,6 +157,7 @@
       totalResult.textContent = `Total: ${total}`;
       highResult.textContent = `High: ${Math.max(...rolls)}`;
       lowResult.textContent = `Low: ${Math.min(...rolls)}`;
+      averageResult.textContent = `Average: ${getAverage(rolls)}`;
       mostCommonResult.textContent = `Most Common: ${getMostCommon(rolls)}`;
       leastCommonResult.textContent = `Least Common: ${getLeastCommon(rolls)}`;
       listResult.textContent = `List: ${rolls.join(', ')}`;
@@ -157,11 +165,18 @@
       totalResult.style.display = totalCheckbox.checked ? 'block' : 'none';
       highResult.style.display = highCheckbox.checked ? 'block' : 'none';
       lowResult.style.display = lowCheckbox.checked ? 'block' : 'none';
+      averageResult.style.display = averageCheckbox.checked ? 'block' : 'none';
       mostCommonResult.style.display = mostCommonCheckbox.checked ? 'block' : 'none';
       leastCommonResult.style.display = leastCommonCheckbox.checked ? 'block' : 'none';
       listResult.style.display = listCheckbox.checked ? 'block' : 'none';
 
       resultContainer.style.display = 'block';
+    }
+
+    // Function to get the average value of an array
+    function getAverage(array) {
+      const sum = array.reduce((acc, val) => acc + val, 0);
+      return sum / array.length;
     }
 
     // Function to get the most common numbers in an array
@@ -212,6 +227,8 @@
       const maxVal = Number(document.getElementById('maxVal').value);
       const resultDisplay = document.getElementById('resultDisplay');
       let abilities = [];
+      let currentMoment = new Date();
+      let pastMoment = new Date();
       let tries = 0;
       while (abilities.length < 6 || abilities.reduce((acc, val) => acc + val) < minVal || abilities.reduce((acc, val) => acc + val) > maxVal) {
         tries++;
@@ -225,6 +242,12 @@
           abilities.push(rolls[0] + rolls[1] + rolls[2]);
         }
         abilities.sort((a, b) => b - a);
+        if(tries % 1000000 === 0){
+          currentMoment = new Date();
+          let timeDifference = currentMoment - pastMoment;
+          (console.log(tries/1000000, timeDifference));
+          pastMoment = new Date();
+        }
       }
       resultDisplay.textContent = `You rolled abilities: ${abilities.join(', ')}. It took ${tries} tries. HA! Good luck on your new adventure!`;
     }
@@ -353,6 +376,7 @@
     document.getElementById('totalCheckbox').addEventListener('change', updateVisibility);
     document.getElementById('highCheckbox').addEventListener('change', updateVisibility);
     document.getElementById('lowCheckbox').addEventListener('change', updateVisibility);
+    document.getElementById('averageCheckbox').addEventListener('change', updateVisibility);
     document.getElementById('mostCommonCheckbox').addEventListener('change', updateVisibility);
     document.getElementById('leastCommonCheckbox').addEventListener('change', updateVisibility);
     document.getElementById('listCheckbox').addEventListener('change', updateVisibility);
@@ -362,6 +386,7 @@
       const totalResult = document.getElementById('totalResult');
       const highResult = document.getElementById('highResult');
       const lowResult = document.getElementById('lowResult');
+      const averageResult = document.getElementById('averageResult');
       const mostCommonResult = document.getElementById('mostCommonResult');
       const leastCommonResult = document.getElementById('leastCommonResult');
       const listResult = document.getElementById('listResult');
@@ -369,6 +394,7 @@
       totalResult.style.display = document.getElementById('totalCheckbox').checked ? 'block' : 'none';
       highResult.style.display = document.getElementById('highCheckbox').checked ? 'block' : 'none';
       lowResult.style.display = document.getElementById('lowCheckbox').checked ? 'block' : 'none';
+      averageResult.style.display = document.getElementById('averageCheckbox').checked ? 'block' : 'none';
       mostCommonResult.style.display = document.getElementById('mostCommonCheckbox').checked ? 'block' : 'none';
       leastCommonResult.style.display = document.getElementById('leastCommonCheckbox').checked ? 'block' : 'none';
       listResult.style.display = document.getElementById('listCheckbox').checked ? 'block' : 'none';
