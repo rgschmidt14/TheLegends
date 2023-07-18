@@ -47,9 +47,9 @@
       
     </header>
     <main id="planner-main">
-        <button id="" class="mainBtn" onclick="() => {console.log('editTasks()')}">Edit</button>
+        <button id="startEditingTasksBtn" class="mainBtn" onclick="showEditTasks()">Edit</button>
         <button id="newTaskBtn"  class="mainBtn" onclick="window.location.href = '/Family/Gunnar/Planner/New_Task.html'">New Task :)</button>
-        <button id="reOrder" class="mainBtn" onclick="() => {console.log('reverseOrder()')}">Reverse Order</button>
+        <button id="reOrder" class="mainBtn" onclick="() => {reverseOrder()}">Reverse Order</button>
         <section id="taskList"></section>
       
     </main>
@@ -327,6 +327,10 @@
                             <button class="task-item downBtn" data-taskname="${taskName}">&#8595;</button>
                             <span class="task-item quantityRatioVisualized">${taskList[task].quantityCompleted}/${taskList[task].taskQuantity} ${taskList[task].customUnits}</span>
                             <span class="task-item timeRemainingVisualized">${taskList[task].timeRemainingVisualized}</span>
+                            <span class="hidden editingBtns" id="editTaskBtns-${taskList[task].taskNameNoSpaces}">
+                                <span><button class="editBtn" id="editBtn-${taskList[task].taskNameNoSpaces}" data-taskname="${taskList[task].taskName}">📝edit</button></span>
+                                <span><button class="deleteBtn" id="deleteBtn-${taskList[task].taskNameNoSpaces}" data-taskname="${taskList[task].taskName}">❌delete</button></span>
+                            </span>
                         </summary>
                         <p class="task-item desc">${taskList[task].desc}</p>
                     </details>
@@ -464,6 +468,18 @@
         // Save the updated task list back to local storage
         localStorage.setItem('Task-List', JSON.stringify(taskList));
     }
+    function showEditTasks() {
+        const elements = document.querySelectorAll('.editingBtns');
+        elements.forEach((element) => {
+            element.classList.toggle('hidden');
+        });
+    }
+    function editTask(taskName) {
+
+    }
+    function deleteTask(taskName) {
+
+    }
     
     // Populate the tasks according to the Local Storage
     function populateTasksFromLocalStorage() {
@@ -488,6 +504,10 @@
                             <button class="task-item downBtn" data-taskname="${taskList[task].taskName}">&#8595;</button>
                             <span class="task-item quantityRatioVisualized">${taskList[task].quantityCompleted}/${taskList[task].taskQuantity} ${taskList[task].customUnits}</span>
                             <span class="task-item timeRemainingVisualized">${taskList[task].timeRemainingVisualized}</span>
+                            <span class="hidden editingBtns" id="editTaskBtns-${taskList[task].taskNameNoSpaces}">
+                                <span><button class="editBtn" id="editBtn-${taskList[task].taskNameNoSpaces}" data-taskname="${taskList[task].taskName}">📝edit</button></span>
+                                <span><button class="deleteBtn" id="deleteBtn-${taskList[task].taskNameNoSpaces}" data-taskname="${taskList[task].taskName}">❌delete</button></span>
+                            </span>
                         </summary>
                         <p class="task-item desc">${taskList[task].desc}</p>
                     </details>
@@ -521,6 +541,12 @@
             } else if (event.target.classList.contains("revertBtn")) {
                 const taskName = event.target.dataset.taskname;
                 revertTask(taskName);
+            } else if (event.target.classList.contains("editBtn")) { //!!!!!!!!!!!!!!!!!!!
+                const taskName = event.target.dataset.taskname;
+                editTask(taskName);
+            } else if (event.target.classList.contains("deleteBtn")) { //!!!!!!!!!!!!!!!!!
+                const taskName = event.target.dataset.taskname;
+                deleteTask(taskName);
             }
         });
 
