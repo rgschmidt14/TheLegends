@@ -381,7 +381,7 @@
         
         // Save the updated task list back to local storage
         localStorage.setItem('Task-List', JSON.stringify(taskList));
-        updateTaskList();
+        populateTasksFromLocalStorage()
     }
     function revertTask(taskName) {
         let taskList = JSON.parse(localStorage.getItem('Task-List'));
@@ -541,7 +541,8 @@
 
     // This is what runs the code, allowing everything to update each set time.
     // this no longer works since I need to have the right stuff hidden, I need an update times option that runs on the second, but it only updates the countdown timers, colors, and order depending on which needs done soonest, any bigger updates will be handled in the appropriate function, also I want the time display to only display the largest two times, aka the first 5 symbols in the string "visualizeTimeRemaining" I believe is what it is called.
-    // setInterval(() => {populateTasksFromLocalStorage()}, 1000);
+    // setInterval(() => {populateTasksFromLocalStorage()}, 1000); // yeah I need one of these that only updates a couple of things, like the times mostly so I can actually click stuff.
+    
     
     // vvvv for copy and paste testing purposes vvvv
     // console.log("huh");
