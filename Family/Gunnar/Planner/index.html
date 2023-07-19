@@ -154,11 +154,11 @@
             let btimeRemainingRatio = b.timeRemaining / b.taskTimeAllowed;
             let aValue = atimeRemainingRatio - aFailRatio;
             let bValue = btimeRemainingRatio - bFailRatio;
-            console.log(a.taskName, aValue, atimeRemainingRatio, aFailRatio);
-            console.log(b.taskName, bValue, btimeRemainingRatio, bFailRatio);
+            // console.log(a.taskName, aValue, atimeRemainingRatio, aFailRatio);
+            // console.log(b.taskName, bValue, btimeRemainingRatio, bFailRatio);
             let currentSettings = JSON.parse(localStorage.getItem('Planner-Settings'));
             let reverseOrder = currentSettings.reverseOrder;
-            console.log(reverseOrder);
+            // console.log(reverseOrder);
             if (reverseOrder) {
                 return bValue - aValue;
             } else {
@@ -173,27 +173,10 @@
     }
 
 
-
-
-
-
-
-
-
     // editor handler
 
     //background colors
     // make boxes appear for them to choose the background color and font color for good, do soon, do now, bad, death
-
-
-
-
-
-
-
-
-
-
 
     function updateTaskList() {
         let taskList = JSON.parse(localStorage.getItem('Task-List'));
@@ -223,27 +206,13 @@
                 task.timeRemainingVisualized = "-" + task.timeRemainingVisualized;
             }
             
-            // // setting task failed integrated in the background changing controller
-            // let currentFailures = task.numberOfFailures;
-            // let maxFailures = 0;
-            // if (task.eminanceOfFailure == "Cumulative") {
-            //     maxFailures = task.cumulaNum;
-            // } else if (task.eminanceOfFailure == "Immediate") {
-            //     maxFailures = 1;
-            // }
 
             // changing background color as needed
             let needsChanged = false;
             let currentBackgroundColor = task.backgroundColor;
-            console.log(task.taskName, task.taskTimeAllowed * -1, task.timeRemaining)
+            // console.log(task.taskName, task.taskTimeAllowed * -1, task.timeRemaining)
             
 
-            // else {
-            //     //subtract a count from the failure count down to zero as the minimum, no negative numbers
-            //     if (currentFailures > 0) {
-            //         currentFailures -= 1;
-            //     }
-            // }
             //setting background options in list so they can be accessed by index number later
             let backgroundColors = settings.backgroundColorsChosen;
             let correctBackgroundColor = 0;
@@ -298,13 +267,6 @@
                 task.backgroundColor = backgroundColors[correctBackgroundColor];
                 //task.textColor = textColors[correctBackgroundColor];
             }
-            
-
-            // // setting the new number of failures and saving to the task object
-            // if (currentFailures > maxFailures) {
-            //     currentFailures = maxFailures;
-            // }
-            // task.numberOfFailures = currentFailures;
 
         }
         
@@ -341,14 +303,14 @@
                     </div>
                 </div>
             `;
-            console.log("reverted");
+            // console.log("reverted");
 
     }
     function completeTask(taskName, failed) {
         //reset the time created, original time remaining and the quantity completed to 0, then build the card again with the revertTaskCard Function
         let taskList = JSON.parse(localStorage.getItem('Task-List'));
         let task = taskList[taskName];
-        console.log(task);
+        // console.log(task);
         now = new Date();
         task.lastCompleted = now;
         const currentHours = now.getHours();
@@ -402,7 +364,7 @@
             maxFailures = 1;
         }
         if (failed) {
-            console.log("grr")
+            // console.log("grr")
             // add one to failure count if possible
             if (task.numberOfFailures + 1 < maxFailures + 1) {
                 task.numberOfFailures = Number(task.numberOfFailures) + 1;
@@ -468,6 +430,14 @@
         // Save the updated task list back to local storage
         localStorage.setItem('Task-List', JSON.stringify(taskList));
     }
+    const newTaskPageUrl = '/Family/Gunnar/Planner/New_Task.html';
+
+    // Function to send the taskName parameter to the New_Task.html page
+    function sendTaskNameToNewTaskPage(taskName) {
+        const url = new URL(newTaskPageUrl, window.location.origin);
+        url.searchParams.set('taskName', taskName);
+        window.location.href = url.href;
+    }
     function showEditTasks() {
         const elements = document.querySelectorAll('.editingBtns');
         elements.forEach((element) => {
@@ -475,12 +445,27 @@
         });
     }
     function editTask(taskName) {
-
+        sendTaskNameToNewTaskPage(taskName);
     }
-    function deleteTask(taskName) {
-
+    function deleteTask(taskName, event) {
+        
+        let taskList = JSON.parse(localStorage.getItem('Task-List'));
+        
+        // Check if the task exists in the task list
+        if (taskList.hasOwnProperty(taskName)) {
+            // Delete the task from the task list
+            delete taskList[taskName];
+            
+            // Save the updated task list back to local storage
+            localStorage.setItem('Task-List', JSON.stringify(taskList));
+            event.stopPropagation();
+            // Repopulate the task list to reflect the changes
+            populateTasksFromLocalStorage();
+            
+            // for some reason if the page has not reloaded and a second item is deleted, that click makes this function run twice. and if a third item is deleted before page reload clicking the button runs this code 3 times. so weird huh, how can I fix this?
+        }
     }
-    
+
     // Populate the tasks according to the Local Storage
     function populateTasksFromLocalStorage() {
         updateTaskList();
@@ -546,7 +531,7 @@
                 editTask(taskName);
             } else if (event.target.classList.contains("deleteBtn")) { //!!!!!!!!!!!!!!!!!
                 const taskName = event.target.dataset.taskname;
-                deleteTask(taskName);
+                deleteTask(taskName, event);
             }
         });
 

@@ -113,14 +113,33 @@
 </body>
 <script src="/Site-Stuff/Scripting/Snippets/template_level_snippets.js"></script>
 <script>
-  //filling inputs if available
+  // Filling inputs if available
   let params = new URLSearchParams(window.location.search);
   let currentTask = params.get("taskName");
-  if(currentTask){
-    console.log(`1. ${localStorage.getItem("Task-List")}`)
-    let taskInfo = JSON.parse(localStorage.getItem("Task-List"));
-    console.log(`2. ${taskInfo}`)
+  if (currentTask) {
+    // Retrieve the task information from localStorage based on the taskName
+    let taskInfo = JSON.parse(localStorage.getItem("Task-List"))[currentTask];
+
+    // Pre-fill the form inputs with the task information
+    document.querySelector('#taskName').value = taskInfo.taskName;
+    document.querySelector('#eminanceOfFailure').value = taskInfo.eminanceOfFailure;
+    document.querySelector('#cumulaNum').value = taskInfo.cumulaNum;
+    document.querySelector('#taskUnits').value = taskInfo.taskUnits;
+    document.querySelector('#taskQuantity').value = taskInfo.taskQuantity;
+    document.querySelector('#customUnits').value = taskInfo.customUnits;
+    document.querySelector('#taskHourReset').value = taskInfo.taskHourReset;
+    document.querySelector('#taskDayReset').value = taskInfo.taskDayReset;
+    document.querySelector('#taskTimeAllowed').value = taskInfo.taskTimeAllowed / 60; // Convert from seconds to minutes
+    document.querySelector('#desc').value = taskInfo.desc;
+
+    // Call any necessary functions to handle UI updates based on the pre-filled values
+    showTheThing('eminanceOfFailure', 'Cumulative', 'cumulaNum');
+    showTheThing('taskUnits', 'Custom Units', 'customUnits')
+
+    // Remove the taskName parameter from the URL
+    history.replaceState({}, document.title, window.location.pathname);
   }
+
   function formatDuration(seconds) {
     let days = Math.floor(seconds / (3600 * 24));
     let hours = Math.floor((seconds % (3600 * 24)) / 3600);
@@ -138,7 +157,6 @@
   }
   function getAndSetParams(event) {
     // Prevent the default form submission behavior
-    console.log("working");
     event.preventDefault();
     // Create a new object to store the form data
     let newTask = {};
@@ -167,7 +185,6 @@
     const currentMinutes = now.getMinutes();
 
     // Get the user-specified date and time in hours and minutes
-    console.log(newTask.taskHourReset);
     const userInputTime = newTask.taskHourReset;
     const timeParts = userInputTime.split(":");
     const userDays = newTask.taskDayReset;
@@ -196,7 +213,7 @@
     localStorage.setItem('Task-List', JSON.stringify(taskList));
 
     // Navigate to the task list page
-    window.location.href = '/Family/Gunnar/Planner/New_Task.html';
+    window.location.href = '/Family/Gunnar/Planner/';
   }
 
   // getAndSetParams();
@@ -212,13 +229,11 @@
       theThingsLabel.removeAttribute("hidden");
       theThing.required = true;
       theThingsLabel.required = true;
-      console.log("Ohhh")
     } else {
       theThing.hidden = true;
       theThingsLabel.hidden = true;
       theThing.removeAttribute("required");
       theThingsLabel.removeAttribute("required");
-      console.log("snap")
     }
   }
   // function setUnitOfMeasurement(){
@@ -228,7 +243,7 @@
   
 
   function storeFormData(){
-    console.log("yeah");
+
   }
   function displayTaskInfo(){
 
