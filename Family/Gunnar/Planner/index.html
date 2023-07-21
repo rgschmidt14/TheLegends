@@ -511,6 +511,11 @@
             document.getElementById(`card-${taskList[task].taskNameNoSpaces}`).style.background = `${taskList[task].backgroundColor}`;
         }
 
+        
+
+    }
+    function addEventListenersToEverything() {
+        const taskListSection = document.getElementById("taskList");
         // Add click event listener to the task list section (for event delegation)
         taskListSection.addEventListener("click", function(event) {
             // Check if the clicked element is an up or down button
@@ -534,10 +539,11 @@
                 deleteTask(taskName, event);
             }
         });
-
     }
     // Call the populateTasksFromLocalStorage function to initially populate the task list
     populateTasksFromLocalStorage();
+    // Call addEventListenersToEverything() to add the listeners all in initially
+    addEventListenersToEverything();
 
     // This is what runs the code, allowing everything to update each set time.
     // this no longer works since I need to have the right stuff hidden, I need an update times option that runs on the second, but it only updates the countdown timers, colors, and order depending on which needs done soonest, any bigger updates will be handled in the appropriate function, also I want the time display to only display the largest two times, aka the first 5 symbols in the string "visualizeTimeRemaining" I believe is what it is called.
