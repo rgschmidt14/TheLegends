@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head id="head">
+  <!--Page Data-->
+  <title>Schmidts.Page</title>
+  <meta name="description" content="Schmidts.Page is an Alpha rendition of what will be later released as a set of tools for RPGs on the fly.">
+  <link rel="shortcut icon" href="/Site-Stuff/Assets/Images/golden_bed.ico">
+</head>
+<body>
+    <header id="site-wide-nav-header">
+      
+    </header>
+    <main>
+      
+      
+    </main>
+    <footer id="main-footer">
+
+    </footer>
+</body>
+<script src="/Site-Stuff/Scripting/Snippets/template_level_snippets.js"></script>
+<script>
+  // Settings and Variables
+  if (!localStorage.getItem('Planner-2-Settings')) {
+        let p2_settings = {}
+        // use format p2_settings.the_settings_name = ["The setting one", "Second setting"];
+        p2_settings.completion_color_1 = "rgb(51, 255, 255)";
+        p2_settings.completion_color_2 = "rgb(0, 179, 119)";
+        p2_settings.completion_color_3 = "rgb(68, 204, 0)";
+
+        localStorage.setItem('Planner-2-Settings', JSON.stringify(p2_settings));
+    }
+  // Small Funcitons to be reused and called upon below
+  function fontColorSetter(element, newRGBColor) {
+    element.style.color = newRGBColor;
+  }
+  function backgroundColorSetter(element, newRGBColor){
+    element.style.backgroundColor = newRGBColor;
+  }
+  function fontAndBackgroundColorSetter(element, newFontColor, newBackgroundColor) {
+    fontColorSetter(element, newFontColor);
+    backgroundColorSetter(element, newBackgroundColor);
+  }
+  // Main Functions of page
+  let footer_element = document.getElementById("main-footer");
+  let  
+  backgroundColorSetter(footer_element, "rgb(51, 255, 255)");
+  // Timing Functions to handle updates of objects and visual
+
+</script>
+</html>
+
+
+
