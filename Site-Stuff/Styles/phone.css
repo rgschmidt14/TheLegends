@@ -21,7 +21,7 @@
 
 /**********************************HTML********************************/
 html {
-    background-image: url("/Site-Stuff/Assets/Images/AI-Art/DALL·E 2022-10-03 13.38.52 - Looking into.png");
+    background-image: url("/Site-Stuff/Assets/Images/AI-Art/DatinosTopFloorBookShelf.webp");
 }
 
 
@@ -43,7 +43,7 @@ body {
 #site-wide-nav-header ul {
     display: flex;
     flex-wrap: wrap;
-    background-image: url("/Site-Stuff/Assets/Images/AI-Art/IMG_20220909_012056.png");
+    background-image: url("/Site-Stuff/Assets/Images/AI-Art/PoisonPlanet.webp");
     animation: scrollRight 30s linear infinite;
     background-position: 500px;
     background-size: var(--VIEWPORT_MODIFIER_WIDTH);
