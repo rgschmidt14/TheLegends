@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Curve Fitting Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            width: 80%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        canvas {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Curve Fitting Tool</h1>
+        <form id="data-form">
+            <label for="x">X Coordinate:</label>
+            <input type="text" id="x" name="x">
+            <label for="y">Y Coordinate:</label>
+            <input type="text" id="y" name="y">
+            <button type="button" onclick="addDataPoint()">Add Data Point</button>
+        </form>
+        <canvas id="chart"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const xValues = [];
+        const yValues = [];
+
+        const ctx = document.getElementById('chart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Data Points',
+                    data: [],
+                    backgroundColor: 'blue',
+                    borderColor: 'blue',
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                }]
+            },
+            options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    type: 'linear',
+                    position: 'bottom',
+                    min: -1,
+                    max: 1,
+                },
+                y: {
+                    type: 'linear',
+                    min: -1,
+                    max: 1,
+                }
+            }
+        }
+        });
+
+        function addDataPoint() {
+            const x = parseFloat(document.getElementById('x').value);
+            const y = parseFloat(document.getElementById('y').value);
+
+            if (!isNaN(x) && !isNaN(y)) {
+                xValues.push(x);
+                yValues.push(y);
+
+                chart.data.datasets[0].data.push({ x, y });
+                chart.update();
+
+                document.getElementById('x').value = '';
+                document.getElementById('y').value = '';
+            }
+        }
+    </script>
+</body>
+</html>
